@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Battleship.iml" filepath="$PROJECT_DIR$/Battleship.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ClientApplication/Battleship.ClientApplication.iml" filepath="$PROJECT_DIR$/.idea/modules/ClientApplication/Battleship.ClientApplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ClientApplication/Battleship.ClientApplication.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ClientApplication/Battleship.ClientApplication.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ClientApplication/Battleship.ClientApplication.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ClientApplication/Battleship.ClientApplication.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ServerApplication/Battleship.ServerApplication.iml" filepath="$PROJECT_DIR$/.idea/modules/ServerApplication/Battleship.ServerApplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ServerApplication/Battleship.ServerApplication.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ServerApplication/Battleship.ServerApplication.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ServerApplication/Battleship.ServerApplication.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ServerApplication/Battleship.ServerApplication.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Battleship.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Battleship.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Battleship.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Battleship.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Battleship_Game.iml" filepath="$PROJECT_DIR$/.idea/Battleship_Game.iml" />
+    </modules>
+  </component>
+</project>

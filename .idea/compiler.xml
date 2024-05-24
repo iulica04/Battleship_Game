@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="Battleship" target="21" />
+      <module name="Battleship.ClientApplication" target="21" />
+      <module name="Battleship.ClientApplication.main" target="21" />
+      <module name="Battleship.ClientApplication.test" target="21" />
+      <module name="Battleship.main" target="21" />
+      <module name="Battleship.ServerApplication" target="21" />
+      <module name="Battleship.ServerApplication.main" target="21" />
+      <module name="Battleship.ServerApplication.test" target="21" />
+      <module name="Battleship.test" target="21" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
