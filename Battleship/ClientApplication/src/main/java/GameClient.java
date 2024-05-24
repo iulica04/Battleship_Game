@@ -1,8 +1,10 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.function.Consumer;
 
 public class GameClient {
     private String host;
@@ -10,65 +12,38 @@ public class GameClient {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    private Consumer<String> messageConsumer; // Adăugăm acest câmp
 
-    public GameClient(String host, int port) {
+    public GameClient(String host, int port, Consumer<String> messageConsumer) {
         this.host = host;
         this.port = port;
+        this.messageConsumer = messageConsumer;
     }
 
-    public void start() {
-        try {
+    public void connect() throws IOException {
             socket = new Socket(host, port);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Connected to server at " + host + ":" + port);
+            messageConsumer.accept("Connected to server at " + host + ":" + port + " \n");
+            messageConsumer.accept("Enter your name: ");
 
-            System.out.println("Welcome to the Battleship! \n To start the game, please enter your name: ");
-            String playerName = keyboard.readLine();
-            while (playerName == null || playerName.isEmpty()) {
-
-                System.out.println("Please enter a valid name! \n Enter yout name: ");
-                playerName = keyboard.readLine();
-            }
-            out.println(playerName);
-
-            System.out.println("Commands: \n" + "   -> 'exit' to quit\n" + "   -> 'stop' to stop the server\n" + "   -> 'create game' to create a new game \n" + "   -> 'join game gameID' to join in the game with gameID\n" + "   -> 'make move x y' to make a hit in the position x y\n" + "   -> 'set the ships positions' to set the ships positions\n");
-
-            Thread serverListener = new Thread(() -> {
-                try {
-                    String message;
-                    while ((message = in.readLine()) != null) {
-                        System.out.println(message);
-                    }
-                } catch (IOException e) {
-                    System.out.println("GoodBye!!!!!!!!!!");
-                }
-            });
-            serverListener.start();
-
-            String input;
-            while ((input = keyboard.readLine()) != null) {
-                out.println(input);
-                if (input.equalsIgnoreCase("exit")) {
-                    break;
-                }
-            }
-
-            close();
-
+        new Thread(() -> {
             try {
-                serverListener.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                String response;
+                while ((response = in.readLine()) != null) {
+                    messageConsumer.accept(response);//primeste de la server response si le trimite GameUI
+                }
+            } catch (IOException e) {
+                messageConsumer.accept("Error reading from server: " + e.getMessage());
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
-    private void close() {
+    public void sendCommand(String command) {
+        out.println(command);
+    }
+    public void close() {
         try {
             if (socket != null) {
                 socket.close();
@@ -84,8 +59,5 @@ public class GameClient {
         }
     }
 
-    public static void main(String[] args) {
-        GameClient gameClient = new GameClient("localhost", 2024);
-        gameClient.start();
-    }
+
 }

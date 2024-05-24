@@ -21,5 +21,9 @@ public class GameManager {
     public synchronized Game getGame(int gameId) {
         return games.get(gameId);
     }
+    public synchronized int getGameId() {
+        return nextGameId;
+    }
+
 
 }
