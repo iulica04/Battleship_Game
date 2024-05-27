@@ -77,9 +77,9 @@ public class Game {
             }else{
                 currentPlayer = player1;
             }
-            currentPlayer.setLastMoveHit(hit);  // Setăm rezultatul mutării
-            hasPlayerMadeMove = true;  // Mutarea a fost făcută
-            moveLock.notifyAll();      // Notificăm firul principal
+            currentPlayer.setLastMoveHit(hit);
+            hasPlayerMadeMove = true;
+            moveLock.notifyAll();
         }
 
         return hit;
@@ -100,7 +100,7 @@ public class Game {
 
             synchronized (moveLock) {
                 try {
-                    moveLock.wait(30000);  // Așteaptă până când jucătorul face o mutare sau timpul expiră
+                    moveLock.wait(30000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -116,7 +116,7 @@ public class Game {
 
             if (hasPlayerMadeMove) {
                 hasPlayerMadeMove = false;
-                if (!currentPlayer.getLastMoveHit()) {  // Schimbăm rândul doar dacă lovitura nu a fost un hit
+                if (!currentPlayer.getLastMoveHit()) {
                     player1Turn = !player1Turn;
                 }
             }
