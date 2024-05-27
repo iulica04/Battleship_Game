@@ -2,9 +2,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GameServer {
     private int port;
@@ -37,6 +35,9 @@ public class GameServer {
         return gameManager.getGame(gameId);
     }
 
+    public int getGameId() {
+        return gameManager.getGameId();
+    }
 
     public void start() {
         try {
@@ -68,7 +69,7 @@ public class GameServer {
 
 
     public static void main(String[] args) {
-        GameServer gameServer = new GameServer(2024);
+        GameServer gameServer = new GameServer(1502);
         gameServer.start();
     }
 }

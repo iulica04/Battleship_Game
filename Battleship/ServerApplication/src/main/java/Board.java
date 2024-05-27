@@ -1,75 +1,92 @@
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Board {
-    private char[][] board; // s = ship, h=hit ship, m=missed shot, null = empty cell
-
-    private List<AbstractMap.SimpleEntry<Integer, Integer>> shipsPositions;
-    private int boardSize;
-    private int numberOfShips;
+    private static final int SIZE = 10;
+    private static final int TOTAL_SHIPS = 5;
+    private int[][] grid;
+    private int shipsPlaced;
+    public int cellsSunk;
+    private int cellOccupied ;
 
     public Board() {
+        grid = new int[SIZE][SIZE];
+        shipsPlaced = 0;
+        cellsSunk = 0;
+        cellOccupied = 0;
     }
 
-    public Board(int boardSize, int numberOfShips) {
-        this.boardSize = boardSize;
-        this.numberOfShips = numberOfShips;
-        this.board = new char[boardSize][boardSize];
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                board[i][j] = ' ';
+    // asa punem o "barca" pe board
+    public boolean placeShip(int x1, int y1, int x2, int y2) {
+
+        if (shipsPlaced >= TOTAL_SHIPS) {
+            return false;
+        }
+        if (x1 == x2) {
+            for (int y = y1; y <= y2; y++) {
+                grid[x1][y] = 1;
+                cellOccupied++;
+            }
+        } else if (y1 == y2) {
+            for (int x = x1; x <= x2; x++) {
+                grid[x][y1] = 1;
+                cellOccupied++;
+            }
+        } else {
+            return false;
+        }
+        shipsPlaced++;
+        return true;
+    }
+
+    public boolean attackCell(int x, int y) {
+        if (grid[x][y] == 1) {
+            cellsSunk++;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkShipSunk(int x, int y) {
+        if (grid[x][y] == 6) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void updateCell(int x, int y, boolean hit) {
+        grid[x][y] = hit ? 6 : -1;
+    }
+
+    public boolean allShipsPlaced() {
+        return shipsPlaced == TOTAL_SHIPS;
+    }
+    public void clearBoard() {
+        cellsSunk =0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                grid[i][j] = 0;
             }
         }
-        this.shipsPositions = new ArrayList<>();
     }
+    public boolean allShipsSunk() {
+        return cellsSunk == cellOccupied;
+    }
+    public String display() {
+        StringBuilder sb = new StringBuilder();
+        for (int[] row : grid) {
+            sb.append(' ');
+            sb.append('[');
+            sb.append(' ');
 
-    public boolean makeMove(int x, int y) {
-        if (board[x][y] == 's') {
-            board[x][y] = 'h';
-            numberOfShips--;
-            return true;
-        } else if (board[x][y] == 'm') {
-            return false;
-        } else {
-            board[x][y] = 'm';
-            return false;
+            for (int cell : row) {
+                sb.append(cell).append(',');
+            }
+            sb.deleteCharAt(sb.length() - 1);
+            sb.append(' ');
+            sb.append(']');
+            sb.append(' ');
         }
+        return sb.toString();
     }
 
-    public void setShipsPositions(List<AbstractMap.SimpleEntry<Integer, Integer>> shipsPositions) {
-        this.shipsPositions = shipsPositions;
-        for (AbstractMap.SimpleEntry<Integer, Integer> position : shipsPositions) {
-            board[position.getKey()][position.getValue()] = 's';
-        }
-    }
-
-
-    public int getNumberOfShips() {
-        return numberOfShips;
-    }
-
-    public void setNumberOfShips(int numberOfShips) {
-        this.numberOfShips = numberOfShips;
-    }
-
-    public char[][] getBoard() {
-        return board;
-    }
-
-    public List<AbstractMap.SimpleEntry<Integer, Integer>> getShipsPositions() {
-        return shipsPositions;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Board{" +
-                "board=" + Arrays.toString(board) +
-                ", shipsPositions=" + shipsPositions +
-                ", boardSize=" + boardSize +
-                ", numberOfShips=" + numberOfShips +
-                '}';
-    }
 }
