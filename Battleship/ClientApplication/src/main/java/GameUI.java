@@ -4,41 +4,41 @@ import java.io.IOException;
 
 public class GameUI extends JFrame {
     private GameClient client;
+    //ce va fi Chat area
     private JTextArea textArea;
     private JTextField inputField;
-    private JPanel[][] opponentGrid;
-    private JPanel[][] playerGrid; // Panel for the player's board
+    private JPanel[][] opponentGrid; //opponent board
+    private JPanel[][] playerGrid; //player board
 
     public GameUI(String serverAddress, int serverPort) {
-        // Configure the main frame
+        // main farme
         setTitle("Battleship Game");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Initialize the opponent's view
+        // opponent's view (left panel)
         opponentGrid = new JPanel[10][10];
         initializeGrids(opponentGrid, false);
 
-        // Initialize the player's view
-        playerGrid = new JPanel[10][10];
-        initializeGrids(playerGrid, true);
-
-        // Create and configure the opponent's view panel
         JPanel opponentPanel = createBoardPanel(opponentGrid, "Opposing Grid");
 
-        // Configure the right panel with BorderLayout
+        // right panel =player's view + control panel
         JPanel rightPanel = new JPanel(new BorderLayout());
+
+        // player's view
+        playerGrid = new JPanel[10][10];
+        initializeGrids(playerGrid, true);
 
         // Add the player's board panel to the center of the right panel
         rightPanel.add(createBoardPanel(playerGrid, "My Board"), BorderLayout.CENTER);
 
-        // Add the control panel to the bottom of the right panel
+        // control panel
         JPanel controlPanel = new JPanel(new BorderLayout());
         textArea = new JTextArea(10, 10);
         textArea.setLineWrap(true);
         textArea.setEditable(false);
-        controlPanel.add(new JScrollPane(textArea), BorderLayout.CENTER); // Add the text area for command responses
+        controlPanel.add(new JScrollPane(textArea), BorderLayout.CENTER);//display the chat area
 
         inputField = new JTextField();
         inputField.addActionListener(e -> {
@@ -48,9 +48,9 @@ public class GameUI extends JFrame {
             if ("exit".equalsIgnoreCase(command.trim()))
                 closeWindow();
         });
-        controlPanel.add(inputField, BorderLayout.SOUTH); // Add the input field for commands
+        controlPanel.add(inputField, BorderLayout.SOUTH); // write the command
 
-        rightPanel.add(controlPanel, BorderLayout.SOUTH); // Place the control panel at the bottom
+        rightPanel.add(controlPanel, BorderLayout.SOUTH);
 
         // Add the opponent's view and the right panel to the main panel
         JPanel mainPanel = new JPanel(new GridLayout(1, 2, 10, 10));
@@ -99,7 +99,7 @@ public class GameUI extends JFrame {
             gridPanel.add(new JLabel(String.valueOf(j), SwingConstants.CENTER));
         }
         for (int i = 0; i < 10; i++) {
-            gridPanel.add(new JLabel(String.valueOf(i), SwingConstants.CENTER)); // Row header
+            gridPanel.add(new JLabel(String.valueOf(i), SwingConstants.CENTER));
             for (int j = 0; j < 10; j++) {
                 gridPanel.add(grid[i][j]);
             }
@@ -112,8 +112,9 @@ public class GameUI extends JFrame {
 
     // Handle server responses and update the UI
     private void handleServerResponse(String response) {
+
         SwingUtilities.invokeLater(() -> {  // Ensure UI responsiveness
-            textArea.append(response + "\n"); // Server response
+            textArea.append(response + "\n");
             System.out.println("Received response from server: " + response);
 
             if (response.startsWith("Enter your name")) {
@@ -137,9 +138,8 @@ public class GameUI extends JFrame {
                 updateGrid(result, coordinates);
 
             } else if (response.startsWith("Am afisat tabla de joc aici:")) {
-                // Update the player's board
                 String boardState = response.substring("Am afisat tabla de joc aici: ".length());
-                System.out.println("Board state: " + boardState); // Log the board state
+                System.out.println("MyBoard : " + boardState);
                 updatePlayerGrid(boardState);
 
             } else if (response.startsWith("Game over!"))
@@ -156,19 +156,16 @@ public class GameUI extends JFrame {
         });
     }
 
+    //Opponent's grid update
     private void updateGrid(String result, String coordinates) {
         System.out.println("Updating grid with result: " + result + " at " + coordinates);
 
-        // Split the coordinates by space to separate x and y
         String[] parts = coordinates.split(" ");
-
-        // Ensure we have enough parts to extract coordinates
         if (parts.length >= 2) {
-            // Extract x and y coordinates and convert them to integers
+
             int x = Integer.parseInt(parts[0]);
             int y = Integer.parseInt(parts[1]);
 
-            // Update the corresponding panel based on the result
             JPanel targetPanel = opponentGrid[x][y];
             if ("Hit".equals(result))
                 targetPanel.setBackground(Color.GREEN);
@@ -181,8 +178,9 @@ public class GameUI extends JFrame {
         }
     }
 
+     //Player's grid update =>// Convert boardState string (from display board command) to 2D array
     private void updatePlayerGrid(String boardState) {
-        // Convert boardState string to 2D array
+
         String[] rows = boardState.split("\\[");
         for (int i = 0; i < rows.length; i++) {
             rows[i] = rows[i].replaceAll("[\\[\\] ]", "");
@@ -190,7 +188,7 @@ public class GameUI extends JFrame {
             for (int j = 0; j < cells.length; j++) {
                 if (!cells[j].isEmpty()) {
                     int cellValue = Integer.parseInt(cells[j]);
-                    JPanel targetPanel = playerGrid[i -1][j]; // Adjust i with an offset of 1
+                    JPanel targetPanel = playerGrid[i -1][j];
                     if (cellValue == 1) {
                         targetPanel.setBackground(Color.BLUE);
                     } else {
