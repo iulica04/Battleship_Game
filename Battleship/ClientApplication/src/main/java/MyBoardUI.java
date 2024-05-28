@@ -4,16 +4,19 @@ import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 public class MyBoardUI extends JFrame {
+    private GameClient client;
     private static final int GRID_SIZE = 10; // Dimensiunea grilei 10x10
     private JPanel gridPanel;
     private JPanel[][] cells; // Stocăm referințele la celule
     private ShipPanel[] ships;
+    private int placedShipCount = 0;
 
-    public MyBoardUI() {
+    public MyBoardUI(String serverAddress, int serverPort) {
         setTitle("My Board");
-        setSize(800, 600);
+        setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -38,10 +41,17 @@ public class MyBoardUI extends JFrame {
         shipsPanel.setLayout(new BoxLayout(shipsPanel, BoxLayout.Y_AXIS));
 
         // Exemplu de creare a 3 nave cu dimensiuni diferite
-        ships = new ShipPanel[3];
-        ships[0] = new ShipPanel("Ship 1", 3); // Navă de dimensiune 3
-        ships[1] = new ShipPanel("Ship 2", 2); // Navă de dimensiune 2
-        ships[2] = new ShipPanel("Ship 3", 4); // Navă de dimensiune 4
+        ships = new ShipPanel[9];
+        ships[0] = new ShipPanel("Ship 1 DOWN", 1);
+        ships[1] = new ShipPanel("Ship 2 DOWN", 2);
+        ships[2] = new ShipPanel("Ship 3 DOWN", 3);
+        ships[3] = new ShipPanel("Ship 4 DOWN", 4);
+        ships[4] = new ShipPanel("Ship 5 DOWN", 5);
+
+        ships[5] = new ShipPanel("Ship 2 UP", 2);
+        ships[6] = new ShipPanel("Ship 3 UP", 3);
+        ships[7] = new ShipPanel("Ship 4 UP", 4);
+        ships[8] = new ShipPanel("Ship 5 UP", 5);
 
         for (ShipPanel ship : ships) {
             shipsPanel.add(ship);
@@ -54,6 +64,14 @@ public class MyBoardUI extends JFrame {
 
         setLocationRelativeTo(null); // Centrează fereastra pe ecran
         setVisible(true);
+
+        // se incearca conectarea la server si initializara clientului
+        try {
+            client = new GameClient(serverAddress, serverPort, this::handleServerResponse);
+            client.connect();
+        } catch (IOException e) {
+            System.out.println("Could not connect to server: " + e.getMessage());
+        }
     }
 
     private class ShipPanel extends JPanel {
@@ -63,7 +81,11 @@ public class MyBoardUI extends JFrame {
         public ShipPanel(String name, int size) {
             this.name = name;
             this.size = size;
-            setPreferredSize(new Dimension(100, 50 * size)); // Dimensiunea vizuală a navei
+            if(name.endsWith("DOWN")) {
+                setPreferredSize(new Dimension(150 , 50*size)); // Dimensiunea vizuală a navei
+            } else {
+                setPreferredSize(new Dimension(50*size, 150)); // Dimensiunea vizuală a navei
+            }
             setBackground(Color.GRAY);
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
             JLabel label = new JLabel(name);
@@ -117,12 +139,14 @@ public class MyBoardUI extends JFrame {
         public void dragDropEnd(DragSourceDropEvent dsde) {
             if (dsde.getDropSuccess()) {
                 ShipPanel ship = (ShipPanel) dsde.getDragSourceContext().getComponent();
+                ship.setBackground(Color.ORANGE); // Schimbă culoarea navei după plasare
                 ship.setVisible(false); // Ascunde nava după plasare
+
             }
         }
     }
 
-    private class ShipDropTargetListener implements DropTargetListener {
+    private class ShipDropTargetListener extends Component implements DropTargetListener {
         @Override
         public void dragEnter(DropTargetDragEvent dtde) {}
 
@@ -135,12 +159,12 @@ public class MyBoardUI extends JFrame {
         @Override
         public void dragExit(DropTargetEvent dte) {}
 
+
         @Override
         public void drop(DropTargetDropEvent dtde) {
             try {
                 Transferable transferable = dtde.getTransferable();
                 if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    dtde.acceptDrop(DnDConstants.ACTION_MOVE);
                     String data = (String) transferable.getTransferData(DataFlavor.stringFlavor);
                     String[] parts = data.split(":");
                     String shipName = parts[0];
@@ -151,23 +175,50 @@ public class MyBoardUI extends JFrame {
                     int row = location.y / (gridPanel.getHeight() / GRID_SIZE);
                     int col = location.x / (gridPanel.getWidth() / GRID_SIZE);
 
+                    // Verificăm dacă numărul maxim de nave a fost atins
+                    if (placedShipCount >= 5) {
+                        checkGameStatus();
+                        return;
+                    }
+
                     // Verificăm dacă nava se încadrează pe grilă
-                    if (col + shipSize <= GRID_SIZE) {
-                        for (int i = 0; i < shipSize; i++) {
+                    if(placedShipCount <= 5){
+                    if (row + shipSize <= GRID_SIZE && shipName.endsWith("UP")) {
+
+                            for (int i = 0; i < shipSize; i++) {
+                                cells[row + i][col].setBackground(Color.GRAY);
+                            }
+
+                            String shipPosition = String.format("%d %d %d %d", row, col, row + shipSize - 1, col);
+                            System.out.println("Ship position: " + shipPosition);
+                            sendCommandSetPositions(row, col, row + shipSize - 1, col, shipName);
+                            placedShipCount++;
+
+                            dtde.dropComplete(true);
+
+                        } else if(col + shipSize <= GRID_SIZE && shipName.endsWith("DOWN")) {
+                            for (int i = 0; i < shipSize; i++) {
                             cells[row][col + i].setBackground(Color.GRAY);
-                        }
+                             }
+
+                        String shipPosition = String.format("%d %d %d %d", row, col, row, col + shipSize - 1);
+                        // Trimiteți coordonatele către server sau salvați-le pentru utilizare ulterioară
+                        System.out.println("Ship position: " + shipPosition);
+                        sendCommandSetPositions(row, col, row, col + shipSize - 1, shipName);
+                        placedShipCount++;
+
                         dtde.dropComplete(true);
-                    } else {
+                    }
+                    }else {
                         dtde.rejectDrop();
                     }
-                } else {
-                    dtde.rejectDrop();
                 }
             } catch (Exception e) {
                 dtde.rejectDrop();
                 e.printStackTrace();
             }
         }
+
     }
 
     private class ShipTransferHandler extends TransferHandler {
@@ -182,8 +233,38 @@ public class MyBoardUI extends JFrame {
             return MOVE;
         }
     }
+    private void checkGameStatus() {
+        if (placedShipCount >= 5) {
+            System.out.println("All ships placed!You may now play the game!");
+            JOptionPane.showMessageDialog(this, "All ships placed!");
+            placedShipCount=0;
 
+        } else {
+            System.out.println("Not all ships placed!");
+            JOptionPane.showMessageDialog(this, "Not all ships placed!");
+
+        }
+    }
+    private void sendCommandSetPositions(int x1, int y1, int x2, int y2, String shipName) {
+            String command = "place ship " + x1 + " " + y1 + " " + x2 + " " + y2; // Așezare în jos
+            System.out.println("Sending move: " + command);
+            client.sendCommand(command);
+    }
+    private void handleServerResponse(String response) {
+        SwingUtilities.invokeLater(() -> {  //asigura o interfata grafica responsive.
+
+            System.out.println("Received response from server: " + response);
+
+            if (response.startsWith("Enter your name")) {
+                String playerName = JOptionPane.showInputDialog(this, "Enter your name:");
+                if (playerName != null && !playerName.trim().isEmpty())
+                    client.sendCommand("name " + playerName.trim());
+            }else if(response.startsWith("Ship placed.")){
+                System.out.println("Ship placed.");
+            }
+        });
+    }
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MyBoardUI::new);
+        SwingUtilities.invokeLater(() -> new WelcomeScreen());
     }
 }

@@ -74,17 +74,12 @@ public class Board {
     public String display() {
         StringBuilder sb = new StringBuilder();
         for (int[] row : grid) {
-            sb.append(' ');
             sb.append('[');
-            sb.append(' ');
-
             for (int cell : row) {
                 sb.append(cell).append(',');
             }
             sb.deleteCharAt(sb.length() - 1);
-            sb.append(' ');
             sb.append(']');
-            sb.append(' ');
         }
         return sb.toString();
     }

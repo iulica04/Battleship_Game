@@ -147,6 +147,31 @@ public class ClientThread extends Thread {
 
                     out.println("Ships positions set! Now you can start the game! Use 'start game' command to start the game!");
 
+                }else if (inputLine.startsWith("place ship") ) {
+
+                    try {
+                        String[] parts = inputLine.split(" ");
+                        int x1 = Integer.parseInt(parts[2]);
+                        int y1 = Integer.parseInt(parts[3]);
+                        int x2 = Integer.parseInt(parts[4]);
+                        int y2 = Integer.parseInt(parts[5]);
+
+                        if((x1==x2 && y1 >y2) || (y1==y2 && x1 >x2)){
+                            out.println( "Invalid coordinates, must be (x1==x2 && y1 <= y2) || (y1==y2 && x1 <= x2).");
+                        }else {
+                            boolean success = player.getBoard().placeShip(x1, y1, x2, y2);
+                            if (success) {
+                                out.println( "Ship placed. Am afisat tabla de joc aici: " + player.displayBoard());
+                            } else {
+                                out.println( "Failed to place ship.");
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        out.println( "Invalid coordinates.");
+                    }
+
+
+
                 } else if (inputLine.contains("make move")) {
                     String[] parts = inputLine.split(" ");
                     int x = Integer.parseInt(parts[2]);

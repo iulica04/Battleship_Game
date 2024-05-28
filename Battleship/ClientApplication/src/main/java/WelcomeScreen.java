@@ -56,7 +56,7 @@ public class WelcomeScreen extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Când butonul este apăsat, deschide interfața "My Board" și închide splash screen-ul
-                SwingUtilities.invokeLater(() -> new MyBoardUI());
+                SwingUtilities.invokeLater(() -> new MyBoardUI("localhost", 1502));
                 dispose();
             }
         });
