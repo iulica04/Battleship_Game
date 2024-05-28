@@ -8,9 +8,9 @@ import java.io.IOException;
 
 public class MyBoardUI extends JFrame {
     private GameClient client;
-    private static final int GRID_SIZE = 10; // Dimensiunea grilei 10x10
+    private static final int GRID_SIZE = 10;
     private JPanel gridPanel;
-    private JPanel[][] cells; // Stocăm referințele la celule
+    private JPanel[][] cells;
     private ShipPanel[] ships;
     private int placedShipCount = 0;
 
@@ -20,7 +20,7 @@ public class MyBoardUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Creăm grila și inițializăm celulele
+        //Creates the grid (MyBoard)
         gridPanel = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
         gridPanel.setPreferredSize(new Dimension(400, 400));
         cells = new JPanel[GRID_SIZE][GRID_SIZE];
@@ -36,11 +36,11 @@ public class MyBoardUI extends JFrame {
             }
         }
 
-        // Creăm panoul pentru nave
+        //Ships Panel
         JPanel shipsPanel = new JPanel();
         shipsPanel.setLayout(new BoxLayout(shipsPanel, BoxLayout.Y_AXIS));
 
-        // Exemplu de creare a 3 nave cu dimensiuni diferite
+        //Ship types
         ships = new ShipPanel[9];
         ships[0] = new ShipPanel("Ship 1 DOWN", 1);
         ships[1] = new ShipPanel("Ship 2 DOWN", 2);
@@ -62,10 +62,10 @@ public class MyBoardUI extends JFrame {
         add(gridPanel, BorderLayout.CENTER);
         add(shipsPanel, BorderLayout.EAST);
 
-        setLocationRelativeTo(null); // Centrează fereastra pe ecran
+        setLocationRelativeTo(null); //for centering the window !!!!
         setVisible(true);
 
-        // se incearca conectarea la server si initializara clientului
+        // server connection
         try {
             client = new GameClient(serverAddress, serverPort, this::handleServerResponse);
             client.connect();
@@ -76,15 +76,15 @@ public class MyBoardUI extends JFrame {
 
     private class ShipPanel extends JPanel {
         private String name;
-        private int size; // Dimensiunea navei
+        private int size;
 
         public ShipPanel(String name, int size) {
             this.name = name;
             this.size = size;
             if(name.endsWith("DOWN")) {
-                setPreferredSize(new Dimension(150 , 50*size)); // Dimensiunea vizuală a navei
+                setPreferredSize(new Dimension(150 , 50*size));
             } else {
-                setPreferredSize(new Dimension(50*size, 150)); // Dimensiunea vizuală a navei
+                setPreferredSize(new Dimension(50*size, 150));
             }
             setBackground(Color.GRAY);
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -139,8 +139,8 @@ public class MyBoardUI extends JFrame {
         public void dragDropEnd(DragSourceDropEvent dsde) {
             if (dsde.getDropSuccess()) {
                 ShipPanel ship = (ShipPanel) dsde.getDragSourceContext().getComponent();
-                ship.setBackground(Color.ORANGE); // Schimbă culoarea navei după plasare
-                ship.setVisible(false); // Ascunde nava după plasare
+                ship.setBackground(Color.ORANGE);
+                ship.setVisible(false);
 
             }
         }
@@ -175,13 +175,13 @@ public class MyBoardUI extends JFrame {
                     int row = location.y / (gridPanel.getHeight() / GRID_SIZE);
                     int col = location.x / (gridPanel.getWidth() / GRID_SIZE);
 
-                    // Verificăm dacă numărul maxim de nave a fost atins
+                    //Checks if all ships have been placed
                     if (placedShipCount >= 5) {
                         checkGameStatus();
                         return;
                     }
 
-                    // Verificăm dacă nava se încadrează pe grilă
+                    // Checks if the ship can be placed
                     if(placedShipCount <= 5){
                     if (row + shipSize <= GRID_SIZE && shipName.endsWith("UP")) {
 
@@ -202,7 +202,6 @@ public class MyBoardUI extends JFrame {
                              }
 
                         String shipPosition = String.format("%d %d %d %d", row, col, row, col + shipSize - 1);
-                        // Trimiteți coordonatele către server sau salvați-le pentru utilizare ulterioară
                         System.out.println("Ship position: " + shipPosition);
                         sendCommandSetPositions(row, col, row, col + shipSize - 1, shipName);
                         placedShipCount++;
@@ -246,12 +245,12 @@ public class MyBoardUI extends JFrame {
         }
     }
     private void sendCommandSetPositions(int x1, int y1, int x2, int y2, String shipName) {
-            String command = "place ship " + x1 + " " + y1 + " " + x2 + " " + y2; // Așezare în jos
+            String command = "place ship " + x1 + " " + y1 + " " + x2 + " " + y2;
             System.out.println("Sending move: " + command);
             client.sendCommand(command);
     }
     private void handleServerResponse(String response) {
-        SwingUtilities.invokeLater(() -> {  //asigura o interfata grafica responsive.
+        SwingUtilities.invokeLater(() -> {  //responsive UI
 
             System.out.println("Received response from server: " + response);
 

@@ -178,7 +178,7 @@ public class GameUI extends JFrame {
         }
     }
 
-     //Player's grid update =>// Convert boardState string (from display board command) to 2D array
+     //Player's grid update => Convert boardState string (from display board command) to 2D array
     private void updatePlayerGrid(String boardState) {
 
         String[] rows = boardState.split("\\[");
