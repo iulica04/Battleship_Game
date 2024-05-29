@@ -16,8 +16,7 @@ public class Board {
 
     // asa punem o "barca" pe board
     public boolean placeShip(int x1, int y1, int x2, int y2) {
-
-        if (shipsPlaced >= TOTAL_SHIPS) {
+        if (shipsPlaced == TOTAL_SHIPS) {
             return false;
         }
         if (x1 == x2) {
@@ -34,6 +33,23 @@ public class Board {
             return false;
         }
         shipsPlaced++;
+        return true;
+    }
+   public boolean deleteShip(int x1, int y1, int x2, int y2) {
+        if (x1 == x2) {
+            for (int y = y1; y <= y2; y++) {
+                grid[x1][y] = 0;
+                cellOccupied--;
+            }
+        } else if (y1 == y2) {
+            for (int x = x1; x <= x2; x++) {
+                grid[x][y1] = 0;
+                cellOccupied--;
+            }
+        } else {
+            return false;
+        }
+        shipsPlaced--;
         return true;
     }
 

@@ -32,7 +32,7 @@ public class WelcomeScreen extends JFrame {
         startButton.setFont(new Font("Arial", Font.BOLD, 16));
         startButton.setForeground(Color.red);
         startButton.setPreferredSize(new Dimension(200, 50));
-        startButton.addActionListener(new ActionListener() {
+       startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
