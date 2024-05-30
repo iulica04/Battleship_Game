@@ -4,11 +4,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Game {
-    private Player player1;
-    private Player player2;
+    private PlayerManager player1;
+    private PlayerManager player2;
     private boolean player1Turn;
-    private Player LosingPlayer;
-    private Player WinningPlayer;
+    private PlayerManager LosingPlayer;
+    private PlayerManager WinningPlayer;
     private boolean started;
     private Timer gameTimer = new Timer();
     private long gameDurationMillis = 600000;
@@ -18,18 +18,18 @@ public class Game {
     private boolean stillPlayerTurn= false;
     private final Object moveLock = new Object();
     private boolean gameOver = false;
-    private List<Player> players=new ArrayList<>();
-    private Player currentPlayer;
+    private List<PlayerManager> players=new ArrayList<>();
+    private PlayerManager currentPlayer;
 
 
-    public Game(Player player1) {
+    public Game(PlayerManager player1) {
         this.player1 = player1;
         this.player1Turn = true;
         this.started = false;
         this.players.add(player1);
     }
 
-    public synchronized void addSecondPlayer(Player player2) {
+    public synchronized void addSecondPlayer(PlayerManager player2) {
         this.player2 = player2;
         this.players.add(player2);
         player1.sendMessage(player2.getName() + " has joined the game! Enter 'set the ships positions' to set the ships positions!");
@@ -40,7 +40,7 @@ public class Game {
     }
 
     public synchronized boolean isReadyToStart() {
-        for (Player p : getPlayers()) {
+        for (PlayerManager p : getPlayers()) {
             if (!p.getBoard().allShipsPlaced()) {
                 settedShipsByBoth = false;
             }else{
@@ -67,7 +67,7 @@ public class Game {
             new Thread(this::runGameLoop).start();
         }
     }
-    public boolean makeMove(int x, int y, Player opponent) {
+    public boolean makeMove(int x, int y, PlayerManager opponent) {
         boolean hit = opponent.getBoard().attackCell(x, y);
         opponent.getOpponentViewBoard().updateCell(x, y, hit);
 
@@ -88,8 +88,8 @@ public class Game {
 
     private void runGameLoop() {
         while (!gameOver) {
-            Player currentPlayer = player1Turn ? player1 : player2;
-            Player opponentPlayer = player1Turn ? player2 : player1;
+            PlayerManager currentPlayer = player1Turn ? player1 : player2;
+            PlayerManager opponentPlayer = player1Turn ? player2 : player1;
 
             currentPlayer.sendMessage("Your turn! Make a move!");
             currentPlayer.sendMessage(currentPlayer.displayBoard());
@@ -167,7 +167,7 @@ public class Game {
         char[][] board = player.equals(player1) ? board1.getBoard() : board2.getBoard();
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Player ").append(player.getName()).append("'s Board:\n");
+        sb.append("Player ").append(player.getName()).append("'s entity.Board:\n");
         sb.append("    ");
         for (int i = 0; i < 10; i++) {
             sb.append(" ").append((char) ('A' + i)).append(" ");
@@ -200,26 +200,26 @@ public class Game {
 
 
 
-    public Player getPlayer1() {
+    public PlayerManager getPlayer1() {
         return player1;
     }
 
-    public Player getPlayer2() {
+    public PlayerManager getPlayer2() {
         return player2;
     }
 
     public boolean isPlayer1Turn() {
         return player1Turn;
     }
-    public List<Player> getPlayers() {
+    public List<PlayerManager> getPlayers() {
         return players;
-    }public void setPlayers(List<Player> players) {
+    }public void setPlayers(List<PlayerManager> players) {
         this.players = players;
     }
     public String getGameStatus() {
         StringBuilder sb = new StringBuilder();
         sb.append("In joc sunt urmatorii jucatori: ").append(" ");
-        for (Player player : getPlayers()) {
+        for (PlayerManager player : getPlayers()) {
             sb.append("- ").append(player.getName()).append(" ");
         }
         /*sb.append("| Jucatorul care a creat jocul: ").append(getGame(nextGameId).getPlayer1().getName()).append(" ");*/

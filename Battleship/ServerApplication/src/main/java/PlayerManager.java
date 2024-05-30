@@ -1,8 +1,14 @@
+import entity.Board;
+import entity.Player;
+import repository.PlayerRepository;
+
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class Player {
-    private String name;
+
+public class PlayerManager {
+    private Player player;
+    private PlayerRepository playerRepository;
     private Socket socket;
     private PrintWriter out;
     //pentru fiecare player am 2 tabele
@@ -12,8 +18,11 @@ public class Player {
     private boolean lastMoveHit;
 
 
-    public Player(String name, Socket socket, PrintWriter out) {
-        this.name = name;
+    public PlayerManager(String name, Socket socket, PrintWriter out) {
+
+        player = new Player(name);
+        playerRepository = new PlayerRepository();
+        playerRepository.create(player);
         this.board = new Board();
         this.opponentViewBoard = new Board();
         this.socket = socket;
@@ -21,7 +30,7 @@ public class Player {
     }
 
     public String getName() {
-        return name;
+        return player.getName();
     }
 
     public void sendMessage(String message) {
@@ -42,9 +51,6 @@ public class Player {
         this.lastMoveHit = hit;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Board getBoard() {
         return board;

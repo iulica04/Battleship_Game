@@ -1,3 +1,4 @@
+package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,13 +27,13 @@ public class GameClient {
         out = new PrintWriter(socket.getOutputStream(), true);
         BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
         messageConsumer.accept("Connected to server at " + host + ":" + port + " \n");
-        messageConsumer.accept("Enter your name: ");
+        messageConsumer.accept("waiting for your name...");
 
         new Thread(() -> {
             try {
                 String response;
                 while ((response = in.readLine()) != null) {
-                    messageConsumer.accept(response);//primeste de la server response si le trimite GameUI
+                    messageConsumer.accept(response);//primeste de la server response si le trimite gameInterface.GameUI
                 }
             } catch (IOException e) {
                 messageConsumer.accept("Error reading from server: " + e.getMessage());

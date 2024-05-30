@@ -8,7 +8,7 @@ public class GameServer {
     private int port;
     private ServerSocket serverSocket;
     private boolean running;
-    private List<Player> connectedClients;
+    private List<PlayerManager> connectedClients;
     private GameManager gameManager;
 
     public GameServer(int port) {
@@ -19,7 +19,7 @@ public class GameServer {
     }
 
 
-    public synchronized void addConnectedClient(Player player) {
+    public synchronized void addConnectedClient(PlayerManager player) {
         connectedClients.add(player);
     }
 
@@ -27,7 +27,7 @@ public class GameServer {
         return connectedClients.stream().anyMatch(player -> player.getName().equals(playerName));
     }
 
-    public int createGame(Player player) {
+    public int createGame(PlayerManager player) {
         return gameManager.createGame(player);
     }
 

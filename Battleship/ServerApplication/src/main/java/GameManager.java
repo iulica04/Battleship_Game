@@ -10,7 +10,7 @@ public class GameManager {
         this.nextGameId = 1;
     }
 
-    public synchronized int createGame(Player player) {
+    public synchronized int createGame(PlayerManager player) {
         Game game = new Game(player);
         int gameId = nextGameId;
         nextGameId++;
