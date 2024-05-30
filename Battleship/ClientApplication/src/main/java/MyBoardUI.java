@@ -12,7 +12,7 @@ import java.io.IOException;
 public class MyBoardUI extends JFrame {
     private GameClient client;
     private static final int GRID_SIZE = 10;
-    private static final int CELL_SIZE = 30; // Dimensiunea fiecărei celule
+    private static final int CELL_SIZE = 30; // Dimensiunea fiecarei celule
     private JPanel gridPanel;
     private JPanel[][] cells;
     private ShipPanel[] ships;
@@ -22,7 +22,7 @@ public class MyBoardUI extends JFrame {
         setTitle("My Board");
         setSize(700, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
+       // setLayout(new BorderLayout());
 
         // Creates the grid (MyBoard)
         gridPanel = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
@@ -31,7 +31,7 @@ public class MyBoardUI extends JFrame {
         gridPanel.setBackground(Color.LIGHT_GRAY);
         cells = new JPanel[GRID_SIZE][GRID_SIZE];
 
-        // După crearea gridului (MyBoard) și a adăugării celulelor în gridPanel
+        // Dupa crearea gridului (MyBoard) si a adaugarii celulelor în gridPanel
         for (int i = 0; i < GRID_SIZE; i++) {
             for (int j = 0; j < GRID_SIZE; j++) {
                 JPanel cell = new JPanel();
@@ -88,29 +88,25 @@ public class MyBoardUI extends JFrame {
 
         // Add action listener to the remove ship button
         removeShipButton.addActionListener(e -> {
-            // Acțiunea de ștergere a unei singure bărci
             String message = "Select a cell from the ship you want to remove.";
             JOptionPane.showMessageDialog(MyBoardUI.this, message);
 
-            // Adăugăm un mouse listener pentru fiecare celulă pentru a permite utilizatorului să selecteze o celulă
             for (int i = 0; i < GRID_SIZE; i++) {
                 for (int j = 0; j < GRID_SIZE; j++) {
                     JPanel cell = cells[i][j];
                     cell.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            // Coordonatele celulei
                             int row = cell.getParent().getComponentZOrder(cell) / GRID_SIZE;
                             int col = cell.getParent().getComponentZOrder(cell) % GRID_SIZE;
-                            // Verificăm dacă celula face parte dintr-o navă
+
+                            // Verify if the cell has a ship and if there are ships placed
                             if (cellHasShip(row, col) && placedShipCount > 0) {
-                                // Trimitem comanda de ștergere a navei la server
                                 clearShipCells(row, col);
                                 placedShipCount--;
                                 // Dupa ce am sters barca, eliminam listenerul de mouse de pe celule pentru a se face doar o stergere
                                 removeMouseListeners();
                             } else {
-                                // Afișăm un mesaj că celula selectată nu este parte a unei nave
                                 JOptionPane.showMessageDialog(MyBoardUI.this, "This cell is not part of a ship.");
                             }
                         }
@@ -119,6 +115,14 @@ public class MyBoardUI extends JFrame {
             }
         });
 
+        startButton.addActionListener(e -> {
+            if (placedShipCount >= 5) {
+                dispose();
+                SwingUtilities.invokeLater(() -> new GameUI(serverAddress, serverPort));
+            } else {
+                JOptionPane.showMessageDialog(this, "Not all ships placed!");
+            }
+        });
 
 
         // server connection
@@ -130,7 +134,7 @@ public class MyBoardUI extends JFrame {
         }
     }
 
-    // Metoda pentru a elimina toți listenerii de mouse de pe celule după ce o barcă a fost ștearsă
+    // Metoda pentru a elimina toti listenerii de mouse de pe celule dupa ce o barca a fost stearsa
     private void removeMouseListeners() {
         for (int i = 0; i < GRID_SIZE; i++) {
             for (int j = 0; j < GRID_SIZE; j++) {
@@ -143,41 +147,38 @@ public class MyBoardUI extends JFrame {
         }
     }
 
-    // Metoda pentru a verifica dacă o celulă face parte dintr-o navă
     private boolean cellHasShip(int row, int col) {
-        // Verificăm dacă celula este colorată cu altă culoare decât CYAN
+        // Verificam daca celula este colorata cu alta culoare decât CYAN
         return !cells[row][col].getBackground().equals(Color.CYAN);
 
     }
 
-    // Metoda pentru a șterge o navă și a recolora celulele implicate
+    // Metoda pentru a sterge o nava
     private void clearShipCells(int x, int y) {
-        // Identificăm dimensiunea și orientarea navei pe baza culorii celulei de start (x, y)
         Color shipColor = cells[x][y].getBackground();
         int rowStart = x;
         int colStart = y;
         int rowEnd = x;
         int colEnd = y;
         if (shipColor.equals(Color.GRAY)) {
-            // Nava este orientată vertical (sus-jos)
+            // Nava este orientata vertical
             while (rowEnd + 1 < GRID_SIZE && cells[rowEnd + 1][colStart].getBackground().equals(Color.GRAY)) {
                 rowEnd++;
             }
         } else if (shipColor.equals(Color.LIGHT_GRAY)) {
-            // Nava este orientată orizontal (stânga-dreapta)
+            // Nava este orientata orizontal
             while (colEnd + 1 < GRID_SIZE && cells[rowStart][colEnd + 1].getBackground().equals(Color.LIGHT_GRAY)) {
                 colEnd++;
             }
         }
-        // Trimitem comanda de ștergere a navei la server
         sendCommandRemoveShip(rowStart, colStart, rowEnd, colEnd);
-        // Recolorăm celulele navei cu culoarea CYAN
         for (int i = rowStart; i <= rowEnd; i++) {
             for (int j = colStart; j <= colEnd; j++) {
                 cells[i][j].setBackground(Color.CYAN);
             }
         }
     }
+
     private void sendCommandRemoveShip(int x1, int y1, int x2, int y2) {
         String command = "delete ship " + x1 + " " + y1 + " " + x2 + " " + y2;
         System.out.println("Sending command: " + command);
@@ -188,7 +189,7 @@ public class MyBoardUI extends JFrame {
     private class ShipPanel extends JPanel {
         private String name;
         private int size;
-        private final int SQUARE_SIZE = 50; // Dimensiunea fiecărui pătrat
+        private final int SQUARE_SIZE = 50; // Dimensiunea fiecarui patrat
 
         public ShipPanel(String name, int size) {
             this.name = name;
@@ -229,10 +230,10 @@ public class MyBoardUI extends JFrame {
                 int x = 90;
                 int y = 20;
                 for (int i = 0; i < size; i++) {
-                    g.setColor(Color.BLACK); // Setare culoare margine
-                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE); // Desenare margine
-                    g.setColor(Color.GRAY); // Setare culoare pentru interior
-                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1); // Desenare interior
+                    g.setColor(Color.BLACK);
+                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+                    g.setColor(Color.GRAY);
+                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1);
 
                     x += SQUARE_SIZE;
                 }
@@ -241,10 +242,10 @@ public class MyBoardUI extends JFrame {
                 int x = 70;
                 int y = 20;
                 for (int i = 0; i < size; i++) {
-                    g.setColor(Color.BLACK); // Setare culoare margine
-                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE); // Desenare margine
-                    g.setColor(Color.GRAY); // Setare culoare pentru interior
-                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1); // Desenare interior
+                    g.setColor(Color.BLACK);
+                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+                    g.setColor(Color.GRAY);
+                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1);
                     x += SQUARE_SIZE;
                 }
 
@@ -252,10 +253,10 @@ public class MyBoardUI extends JFrame {
                 int x = 40;
                 int y = 20;
                 for (int i = 0; i < size; i++) {
-                    g.setColor(Color.BLACK); // Setare culoare margine
-                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE); // Desenare margine
-                    g.setColor(Color.GRAY); // Setare culoare pentru interior
-                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1); // Desenare interior
+                    g.setColor(Color.BLACK);
+                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+                    g.setColor(Color.GRAY);
+                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1);
                     x += SQUARE_SIZE;
                 }
 
@@ -263,10 +264,10 @@ public class MyBoardUI extends JFrame {
                 int x = 25;
                 int y = 20;
                 for (int i = 0; i < size; i++) {
-                    g.setColor(Color.BLACK); // Setare culoare margine
-                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE); // Desenare margine
-                    g.setColor(Color.GRAY); // Setare culoare pentru interior
-                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1); // Desenare interior
+                    g.setColor(Color.BLACK);
+                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+                    g.setColor(Color.GRAY);
+                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1);
                     x += SQUARE_SIZE;
                 }
 
@@ -274,10 +275,10 @@ public class MyBoardUI extends JFrame {
                 int x = 5;
                 int y = 20;
                 for (int i = 0; i < size; i++) {
-                    g.setColor(Color.BLACK); // Setare culoare margine
-                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE); // Desenare margine
-                    g.setColor(Color.GRAY); // Setare culoare pentru interior
-                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1); // Desenare interior
+                    g.setColor(Color.BLACK);
+                    g.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+                    g.setColor(Color.GRAY);
+                    g.fillRect(x + 1, y + 1, SQUARE_SIZE - 1, SQUARE_SIZE - 1);
                     x += SQUARE_SIZE;
                 }
 
@@ -354,7 +355,7 @@ public class MyBoardUI extends JFrame {
 
                     // Checks if the ship can be placed
                     if (placedShipCount <= 5) {
-                        if (row + shipSize <= GRID_SIZE && shipName.endsWith("UP")) {
+                        if (row + shipSize <= GRID_SIZE && shipName.endsWith("UP") && isNotNearOtherBoat(row, col, row + shipSize - 1, col)) {
 
                             for (int i = 0; i < shipSize; i++) {
                                 cells[row + i][col].setBackground(Color.GRAY);
@@ -367,7 +368,7 @@ public class MyBoardUI extends JFrame {
 
                             dtde.dropComplete(true);
 
-                        } else if (col + shipSize <= GRID_SIZE && shipName.endsWith("DOWN")) {
+                        } else if (col + shipSize <= GRID_SIZE && shipName.endsWith("DOWN") && isNotNearOtherBoat(row, col, row, col + shipSize - 1)) {
                             for (int i = 0; i < shipSize; i++) {
                                 cells[row][col + i].setBackground(Color.LIGHT_GRAY);
                             }
@@ -414,6 +415,18 @@ public class MyBoardUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Not all ships placed!");
         }
     }
+    private boolean isNotNearOtherBoat(int x1, int y1, int x2, int y2) {
+        for (int i = x1 - 1; i <= x2 + 1; i++) {
+            for (int j = y1 - 1; j <= y2 + 1; j++) {
+                if (i >= 0 && i < GRID_SIZE && j >= 0 && j < GRID_SIZE) {
+                    if (!cells[i][j].getBackground().equals(Color.CYAN)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     private void sendCommandSetPositions(int x1, int y1, int x2, int y2, String shipName) {
         String command = "place ship " + x1 + " " + y1 + " " + x2 + " " + y2;
@@ -422,7 +435,7 @@ public class MyBoardUI extends JFrame {
     }
 
     private void handleServerResponse(String response) {
-        SwingUtilities.invokeLater(() -> { // responsive UI
+        SwingUtilities.invokeLater(() -> {
             System.out.println("Received response from server: " + response);
 
             if (response.startsWith("Enter your name")) {
