@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+
 public class ClientThread extends Thread {
     private Socket clientSocket;
     private BufferedReader in;
@@ -11,6 +12,7 @@ public class ClientThread extends Thread {
     private GameServer server;
     private Player player;
     private boolean running = false;
+    private int totalOfShips = 0;
 
     public ClientThread(Socket clientSocket, GameServer server) {
         this.clientSocket = clientSocket;
@@ -159,12 +161,17 @@ public class ClientThread extends Thread {
                         if((x1==x2 && y1 >y2) || (y1==y2 && x1 >x2)){
                             out.println( "Invalid coordinates, must be (x1==x2 && y1 <= y2) || (y1==y2 && x1 <= x2).");
                         }else {
+                            if(totalOfShips < 5){
                             boolean success = player.getBoard().placeShip(x1, y1, x2, y2);
                             if (success) {
-                                out.println( "Ship placed. Am afisat tabla de joc aici: " + player.displayBoard());
+                                totalOfShips++;
+                                out.println("Ship placed. Am afisat tabla de joc aici: " + player.displayBoard());
                             } else {
                                 out.println( "Failed to place ship.");
                             }
+                        }else{
+                            out.println("You can't place more than 5 ships.");
+                        }
                         }
                     } catch (NumberFormatException e) {
                         out.println( "Invalid coordinates.");
@@ -220,6 +227,10 @@ public class ClientThread extends Thread {
                             if (opponent.allShipsSunk()) {
                                 System.out.println("Comanda este " + inputLine);
                                 out.println( "Congratulations!" );
+                                //curatam tablele dupa joc
+                                opponent.clearBoards();
+                                player.clearBoards();
+
                         }else{
                                 out.println("Hit "+ x +" " + y + " ! " + player.getName() + "'s turn again." + "Time left for game " );
                             }
@@ -236,17 +247,16 @@ public class ClientThread extends Thread {
                     if (game == null) {
                         out.println( "Player is not in any game.");
                     } else {
-                        System.out.println("Comanda este " + inputLine);
+
                         out.println( "Your status:" + game.getGameStatus());
                     }
 
                 } else if (inputLine.equals("display board")) {
 
-                        System.out.println("Comanda este " + inputLine);
                     out.println( "Am afisat tabla de joc aici: " + player.displayBoard());
 
                 } else if (inputLine.equals("display opponent view")) {
-                        System.out.println("Comanda este " + inputLine);
+
                         out.println("Am afisat opponent's view" + (player.displayOpponentView()));
 
                 }else if (inputLine.equals("exit")) {

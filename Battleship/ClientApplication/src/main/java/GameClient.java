@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,7 +11,7 @@ public class GameClient {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private Consumer<String> messageConsumer; // Adăugăm acest câmp
+    public Consumer<String> messageConsumer; // Adăugăm acest câmp
 
     public GameClient(String host, int port, Consumer<String> messageConsumer) {
         this.host = host;

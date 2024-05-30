@@ -130,12 +130,15 @@ public class Game {
             player2.sendMessage("Game over! It's a tie!");
         }else if(winner.equals("Time's up! ")) {
             if(LosingPlayer.equals(player1)) {
-                player1.sendMessage("Game over! The winner is " + player2.getName());
-                player2.sendMessage("Game over! The winner is " + player2.getName());
+                player1.sendMessage("Game over due time up! The winner is " + player2.getName());
+                player2.sendMessage("Game over due time up! The winner is " + player2.getName());
             }else{
-                player1.sendMessage("Game over! The winner is " + player1.getName());
-                player2.sendMessage("Game over! The winner is " + player1.getName());
+                player1.sendMessage("Game over  due time up! The winner is " + player1.getName());
+                player2.sendMessage("Game over  due time up! The winner is " + player1.getName());
             }
+            //Daca timpul s-a scurs si s-a terminat jocul atunci se sterg toate tablele jucatorilor
+            player1.clearBoards();
+            player2.clearBoards();
         }
         else {
             player1.sendMessage("Game over! The winner is " + winner);

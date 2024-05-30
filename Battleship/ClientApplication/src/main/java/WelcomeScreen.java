@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 public class WelcomeScreen extends JFrame {
     public WelcomeScreen() {
         setTitle("Welcome to Battleship Game");
@@ -38,7 +37,7 @@ public class WelcomeScreen extends JFrame {
 
                 String serverAddress = "localhost";
                 int serverPort = 1502;
-                SwingUtilities.invokeLater(() -> new GameUI(serverAddress, serverPort));
+               // SwingUtilities.invokeLater(() -> new GameUI(serverAddress, serverPort));
                 dispose();
             }
         });

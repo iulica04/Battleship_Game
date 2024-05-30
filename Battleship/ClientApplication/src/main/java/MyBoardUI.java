@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -17,6 +18,7 @@ public class MyBoardUI extends JFrame {
     private JPanel[][] cells;
     private ShipPanel[] ships;
     private int placedShipCount = 0;
+    String playerName;
 
     public MyBoardUI(String serverAddress, int serverPort) {
         setTitle("My Board");
@@ -118,7 +120,7 @@ public class MyBoardUI extends JFrame {
         startButton.addActionListener(e -> {
             if (placedShipCount >= 5) {
                 dispose();
-                SwingUtilities.invokeLater(() -> new GameUI(serverAddress, serverPort));
+                SwingUtilities.invokeLater(() -> new GameUI(client, playerName));
             } else {
                 JOptionPane.showMessageDialog(this, "Not all ships placed!");
             }
@@ -439,10 +441,11 @@ public class MyBoardUI extends JFrame {
             System.out.println("Received response from server: " + response);
 
             if (response.startsWith("Enter your name")) {
-                String playerName = JOptionPane.showInputDialog(this, "Enter your name:");
-                if (playerName != null && !playerName.trim().isEmpty())
+               playerName = JOptionPane.showInputDialog(this, "Enter your name:");
+                if (playerName != null && !playerName.trim().isEmpty()) {
                     client.sendCommand("name " + playerName.trim());
-            } else if (response.startsWith("Ship placed.")) {
+                }
+            } else if (response.startsWith("You can't place more than 5 ships.")) {
                 System.out.println("Ship placed.");
             }
         });

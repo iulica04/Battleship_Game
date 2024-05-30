@@ -64,7 +64,7 @@ public class Player {
     }
 
     public void clearBoards() {
-        // board.clearBoard();
+        board.clearBoard();
         opponentViewBoard.clearBoard();
     }
 

@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
+import java.util.function.Consumer;
 
 public class GameUI extends JFrame {
     private GameClient client;
@@ -12,9 +12,18 @@ public class GameUI extends JFrame {
     private Timer timer;
     private long gameDurationMillis = 600000; // 10 minutes
     private long startTime;
-    private boolean isPlayerTurn;
+    private String playerName;
+    private Consumer<String> messageConsumer; // Adăugăm acest câmp
+    private boolean isPlayerTurn = false;
 
-    public GameUI(String serverAddress, int serverPort) {
+
+    public GameUI(GameClient client, String playerName) {
+
+        this.playerName = playerName;
+        this.client = client;
+        client.messageConsumer= this::handleServerResponse;
+
+
         setTitle("Battleship Game");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -86,17 +95,13 @@ public class GameUI extends JFrame {
 
         setVisible(true);
 
-        isPlayerTurn = false;
+
         startTime = System.currentTimeMillis();
         timer = new Timer(1000, e -> updateTimer());
         timer.start();
 
-        try {
-            client = new GameClient(serverAddress, serverPort, this::handleServerResponse);
-            client.connect();
-        } catch (IOException e) {
-            System.out.println("Could not connect to server: " + e.getMessage());
-        }
+        handleServerResponse("display board");
+
     }
 
     private void updateTimer() {
@@ -110,10 +115,10 @@ public class GameUI extends JFrame {
         if (remainingTimeMillis <= 0) {
             timer.stop();
             timerLabel.setText("Time: 00:00");
-            JOptionPane.showMessageDialog(this, "Time's up!");
-            // Add logic here to handle end of the player's turn due to timeout
+            JOptionPane.showMessageDialog(this, "Time's up!You lost the game!");
+            isPlayerTurn = false;
         } else {
-            int minutes = (int) (remainingTimeMillis / 600000);
+            int minutes = (int) (remainingTimeMillis / 600000) % 60;
             int seconds = (int) ((remainingTimeMillis / 1000) % 60);
             timerLabel.setText(String.format("Time: %02d:%02d", minutes, seconds));
         }
@@ -128,11 +133,17 @@ public class GameUI extends JFrame {
                 if (!isPlayer) {
                     int finalI = i;
                     int finalJ = j;
+
                     grid[i][j].addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
-                            sendMove(finalI, finalJ);
+                            if(isPlayerTurn == true){
+                            sendMove(finalI, finalJ);}
+                            else{
+                                JOptionPane.showMessageDialog(null, "It's not your turn!");
+                            }
                         }
                     });
+
                 }
             }
         }
@@ -164,40 +175,47 @@ public class GameUI extends JFrame {
             System.out.println("Received response from server: " + response);
 
             if (response.startsWith("Enter your name")) {
-                String playerName = JOptionPane.showInputDialog(this, "Enter your name:");
+               // String playerName = JOptionPane.showInputDialog(this, "Enter your name:");
                 if (playerName != null && !playerName.trim().isEmpty()) {
-                    client.sendCommand("name " + playerName.trim());
+                   // client.sendCommand("name " + playerName.trim());
                 }
-            } else if (response.startsWith("Your turn!")) {
+            } else if (response.startsWith("Your turn! Make a move!")) {
                 isPlayerTurn = true;
                 startTime = System.currentTimeMillis();
                 timer.start();
-                JOptionPane.showMessageDialog(this, "It's your turn!");
+                //JOptionPane.showMessageDialog(this, "Your turn! Make a move!");
 
             } else if (response.startsWith("Opponent's turn!")) {
                 isPlayerTurn = false;
                 timer.stop();
-                JOptionPane.showMessageDialog(this, "It's the opponent's turn!");
+                //JOptionPane.showMessageDialog(this, "It's the opponent's turn!");
 
-            } else if (response.startsWith("Game over! You have lost the game.") ||
-                    response.startsWith("Game over! You have won the game.(Time's up for opponent)") ||
-                    response.startsWith("Game started!") ||
+            } else if (response.startsWith("Game started!") ||
                     response.startsWith("Congratulations!") ||
                     response.startsWith("Need two players to start the game.") ||
                     response.startsWith("All players must place all ships before starting the game.") ||
-                    response.startsWith("Game over!")) {
+                    response.contains("Game over! The winner is")||
+                    response.contains("Game over due time up!")||
+                    response.equals("Time's up! Your turn has ended.")) {
                 JOptionPane.showMessageDialog(this, response);
-            } else if (response.startsWith("Hit") || response.startsWith("Miss") || response.startsWith("Sunk")) {
+
+            } else if (response.startsWith("Hit") || response.startsWith("Miss")) {
                 String[] parts = response.split(" ");
                 String result = parts[0];
                 String coordinates = parts[1] + " " + parts[2];
                 updateGrid(result, coordinates);
-            } else if (response.startsWith("Am afisat tabla de joc aici:")) {
+
+            }else if(response.startsWith("Am afisat tabla de joc aici:")){
                 String boardState = response.substring("Am afisat tabla de joc aici: ".length());
                 System.out.println("MyBoard : " + boardState);
                 updatePlayerGrid(boardState);
-            } else if (response.startsWith("Ships positions set!")) {
+
+            }else if(response.startsWith("display board")){
                 sendDisplayBoard();
+
+            }else if(response.equals("Time's up! Your turn has ended.")) {
+                isPlayerTurn = false;
+                JOptionPane.showMessageDialog(this, "Time's up! Your turn has ended. You lost the game!");
             }
         });
     }
@@ -211,14 +229,19 @@ public class GameUI extends JFrame {
             int y = Integer.parseInt(parts[1]);
 
             JPanel targetPanel = opponentGrid[x][y];
+
+            if(isPlayerTurn == true){
             if ("Hit".equals(result)) {
                 targetPanel.setBackground(Color.GREEN);
+               isPlayerTurn= true;
             } else if ("Miss".equals(result)) {
                 targetPanel.setBackground(Color.RED);
-            } else {
-                targetPanel.setBackground(Color.YELLOW);
+                isPlayerTurn=false;
             }
+            }else{
+                JOptionPane.showMessageDialog(this, "It's not your turn!");
 
+            }
             targetPanel.repaint();
         }
     }
