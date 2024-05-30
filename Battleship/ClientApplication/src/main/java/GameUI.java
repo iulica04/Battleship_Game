@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.Consumer;
 
 public class GameUI extends JFrame {
     private GameClient client;
@@ -13,7 +12,6 @@ public class GameUI extends JFrame {
     private long gameDurationMillis = 600000; // 10 minutes
     private long startTime;
     private String playerName;
-    private Consumer<String> messageConsumer; // Adăugăm acest câmp
     private boolean isPlayerTurn = false;
 
 
