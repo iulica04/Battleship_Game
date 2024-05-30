@@ -1,5 +1,7 @@
 package gameInterface;
 
+import client.GameClient;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +15,12 @@ import java.io.File;
 import java.io.IOException;
 
 public class WelcomeScreen extends JFrame {
+    private GameClient client;
+    private String serverAddress = "localhost";
+    private int serverPort = 1502;
+    private JTextField nameField; // Added to make it accessible in handleServerResponse
+    private String playerName;
+
     public WelcomeScreen() {
 
         //COLORS
@@ -22,6 +30,13 @@ public class WelcomeScreen extends JFrame {
         Color outerSpace = Color.decode("#455257");
         Color rawUmber = Color.decode("#956536");
         Color cadetGrey = Color.decode("#91A6AE");
+
+        try {
+            client = new GameClient(serverAddress, serverPort, this::handleServerResponse);
+            client.connect();
+        } catch (IOException ec) {
+            System.out.println("Could not connect to server: " + ec.getMessage());
+        }
 
 
         setTitle("Welcome to Battleship Game");
@@ -50,7 +65,7 @@ public class WelcomeScreen extends JFrame {
         nameLabel.setBorder(new EmptyBorder(0, 60, 20, 0));
         nameLabel.setForeground(Color.WHITE);
 
-        JTextField nameField = new JTextField(20);
+        nameField = new JTextField(20); // Initialize nameField
         nameField.setFont(new Font("Serif", Font.PLAIN, 20));
         nameField.setPreferredSize(new Dimension(100, 40));
         nameField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
@@ -77,12 +92,13 @@ public class WelcomeScreen extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String playerName = nameField.getText();
+                playerName = nameField.getText();
                 if (playerName.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please enter your name", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    SwingUtilities.invokeLater(() -> new PlayerScreen(playerName));
-                    dispose();
+                    // Send player name to the server
+                    client.sendCommand(playerName.trim());
+
                 }
             }
         });
@@ -100,7 +116,7 @@ public class WelcomeScreen extends JFrame {
 
         BufferedImage originalImage = null;
         try {
-            originalImage = ImageIO.read(new File("resources/utils/animated-scene-fleet-of-ships-engaging-in-naval-warfare-illuminated-by-explosions-missile-impacts.bmp"));
+            originalImage = ImageIO.read(new File("Battleship/ClientApplication/src/main/resources/utils/animated-scene-fleet-of-ships-engaging-in-naval-warfare-illuminated-by-explosions-missile-impacts.bmp"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -117,6 +133,25 @@ public class WelcomeScreen extends JFrame {
 
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void handleServerResponse(String response) {
+        System.out.println("Received response from server: " + response);
+
+        if (playerName != null && response.startsWith("waiting for your name...")) {
+            client.sendCommand(playerName.trim());
+        } else if ("Invalid name! Try another one!".equals(response)) {
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(null, "Invalid name. Please enter your name again.", "Error", JOptionPane.ERROR_MESSAGE);
+                playerName = null; // Reset playerName
+                nameField.setText(""); // Clear the name field
+            });
+        } else if (response.equals("Valid name!")) {
+            SwingUtilities.invokeLater(() -> {
+                new PlayerScreen(client, playerName);
+                dispose();
+            });
+        }
     }
 
     public static void main(String[] args) {

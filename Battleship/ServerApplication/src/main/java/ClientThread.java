@@ -1,3 +1,5 @@
+import repository.PlayerRepository;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,15 +32,26 @@ public class ClientThread extends Thread {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
         ) {
             //name validation
-            String playerName = in.readLine();
-            if(playerName == null|| playerName.isEmpty()){
-                out.println("Invalid name! Try again!");
-            }else{
-                player = new PlayerManager(playerName, clientSocket, out);
+            String playerName;
+            while (true) {
+                playerName = in.readLine();
+                if (playerName == null || playerName.isEmpty()) {
+                    out.println("Invalid name! Try again!");
+                } else {
+                    PlayerRepository playerRepository = new PlayerRepository();
+                    if (!playerRepository.findByName(playerName).isEmpty()) {
+                        out.println("Invalid name! Try another one!");
+                    } else {
+                        out.println("Valid name!");
+                        player = new PlayerManager(playerName, clientSocket, out);
+                        server.addConnectedClient(player);
+                        break;
+                    }
+                }
             }
 
 
-            server.addConnectedClient(player);
+
             Game game = null;
 
 

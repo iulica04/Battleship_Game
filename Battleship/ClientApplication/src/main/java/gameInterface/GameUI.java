@@ -14,7 +14,8 @@ public class GameUI extends JFrame {
     private JPanel[][] opponentGrid; //opponent board
     private JPanel[][] playerGrid; //player board
 
-    public GameUI(String serverAddress, int serverPort) {
+    public GameUI(GameClient client) {
+        this.client = client;
         // main farme
         setTitle("Battleship Game");
         setSize(800, 600);
@@ -65,12 +66,6 @@ public class GameUI extends JFrame {
         setVisible(true);
 
         // Try to connect to the server and initialize the client
-        try {
-            client = new GameClient(serverAddress, serverPort, this::handleServerResponse);
-            client.connect();
-        } catch (IOException e) {
-            System.out.println("Could not connect to server: " + e.getMessage());
-        }
     }
 
     // Initialize the grid

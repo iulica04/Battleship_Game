@@ -4,6 +4,8 @@ import client.GameClient;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -24,19 +26,13 @@ public class PlayerScreen extends JFrame {
     Color taupeGray = Color.decode("#7A7885");
     Color mintGreen = Color.decode("#CDF2EB");
 
-    public PlayerScreen(String playerName) {
+    public PlayerScreen(GameClient client, String playerName) {
 
         this.playerName = playerName;
+        this.client = client;
 
         try {
-            client = new GameClient(serverAddress, serverPort, this::handleServerResponse);
-            client.connect();
-        } catch (IOException e) {
-            System.out.println("Could not connect to server: " + e.getMessage());
-        }
-
-        try {
-            backgroundImage = ImageIO.read(new File("E:\\OneDrive\\Desktop\\1299.jpg"));
+            backgroundImage = ImageIO.read(new File("Battleship/ClientApplication/src/main/resources/utils/1299.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,11 +56,18 @@ public class PlayerScreen extends JFrame {
         titlePanel.add(titleLabel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 10)); // Centrarea butoanelor
-        buttonPanel.setOpaque(false); // Să fie transparent, pentru a vedea imaginea de fundal
+        buttonPanel.setOpaque(false); // Sa fie transparent, pentru a vedea imaginea de fundal
         buttonPanel.setBorder(new EmptyBorder(10, 20, 10, 20)); // Marginea panoului
 
         // Crearea butoanelor
         JButton button1 = createButton("Create Game");
+        button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> new GameUI(client));
+                dispose();
+            }
+        });
         JButton button2 = createButton("Join Game");
         JButton button3 = createButton("My History");
         JButton button4 = createButton("Ranking");
@@ -101,16 +104,6 @@ public class PlayerScreen extends JFrame {
             if (backgroundImage != null) {
                 g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
             }
-        }
-    }
-
-    private void handleServerResponse(String response) {
-        System.out.println("Received response from server: " + response);
-
-        if (response.startsWith("waiting for your name...")) {
-            client.sendCommand(playerName.trim());
-
-            //'move attack'
         }
     }
 
@@ -183,8 +176,4 @@ public class PlayerScreen extends JFrame {
         }
     }
 
-
-    public static void main(String[] args) {
-        new PlayerScreen("Player 1");
-    }
 }
