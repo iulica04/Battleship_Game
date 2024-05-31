@@ -70,6 +70,7 @@ public class ClientThread extends Thread {
                     int gameId = server.createGame(player);
                     game = server.getGame(gameId);
                     out.println("Game created with " + gameId + "! Waiting for an opponent to join...");
+                    totalOfShips=0;
 
                 } else if (inputLine.contains("check")) {
                     String[] parts = inputLine.split(" ");
@@ -85,6 +86,7 @@ public class ClientThread extends Thread {
                     String gameIdStr = parts[2];
                     int gameId = Integer.parseInt(gameIdStr);
                     game = server.getGame(gameId);
+                    totalOfShips=0;
 
                     if (game != null) {
                         if (!game.allPlayersAreJoined()) {
@@ -105,7 +107,7 @@ public class ClientThread extends Thread {
                             out.println("All players need to set the ships positions first!");
                         } else {
                             game.start();
-                            out.println("Game started!");
+                           // out.println("Game started!");
                         }
                     } else {
                         out.println("Invalid game id!");
@@ -197,6 +199,7 @@ public class ClientThread extends Thread {
                             boolean success = player.getBoard().deleteShip(x1, y1, x2, y2);
                             if (success) {
                                 out.println( "Ship deleted. Am afisat tabla de joc aici: " + player.displayBoard());
+                                totalOfShips--;
                             } else {
                                 out.println( "Failed to delete ship.");
                             }
@@ -223,7 +226,9 @@ public class ClientThread extends Thread {
                         if (hit) {
                             if (opponent.allShipsSunk()) {
                                 out.println("Hit "+ x +" " + y + " ! Congratulations! You sank all opponent's ships!");
-                                opponent.sendMessage("Your ship was miss at "+ x + " " + y + "! All your ships have been sunk!");
+                                opponent.sendMessage("Your ship was miss at "+ x + " " + y + " ! All your ships have been sunk!");
+                                //stergem tablele dupa ce se termina jocul
+                                totalOfShips=0;
                                 opponent.clearBoards();
                                 player.clearBoards();
                             } else {
@@ -260,8 +265,14 @@ public class ClientThread extends Thread {
 
                 } else if (inputLine.equals("exit")) {
                     break;
+
                 } else if (inputLine.equals("list_games")) {
                     out.println("games_list" + server.getAllGames());
+
+                }else if (inputLine.equals("clear boards")) {
+                    player.clearBoards();
+                    out.println("Boards cleared!");
+
                 } else {
                     out.println("Invalid command " + inputLine);
                 }

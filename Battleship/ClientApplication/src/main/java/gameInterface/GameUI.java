@@ -33,11 +33,16 @@ public class GameUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+
         opponentGrid = new JPanel[10][10];
         initializeGrids(opponentGrid, false);
         JPanel leftPanel = new JPanel(new BorderLayout());
         JPanel opponentPanel = createBoardPanel(opponentGrid, "Opposing Grid");
         leftPanel.add(opponentPanel, BorderLayout.CENTER);
+
+        // Initialize status label
+        statusLabel = new JLabel("Waiting for an opponent...", SwingConstants.CENTER);
+        statusLabel.setFont(new Font("Serif", Font.BOLD, 16));
 
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.Y_AXIS));
@@ -60,7 +65,7 @@ public class GameUI extends JFrame {
         buttonsPanel.add(new JLabel(" \n "));
         buttonsPanel.add(new JLabel(" \n "));
         buttonsPanel.add(new JLabel(" \n "));
-        buttonsPanel.add(new JLabel(" \n "));
+        buttonsPanel.add(statusLabel);
         buttonsPanel.add(new JLabel(" \n "));
         buttonsPanel.add(new JLabel(" \n "));
 
@@ -156,7 +161,7 @@ public class GameUI extends JFrame {
                             if (gameOver == true) {
                                 JOptionPane.showMessageDialog(null, "Game Over!");
                             }else {
-                                if (isPlayerTurn == true) {
+                                if(isPlayerTurn == true) {
                                     sendMove(finalI, finalJ);
                                 } else {
                                     JOptionPane.showMessageDialog(null, "It's not your turn!");
@@ -195,12 +200,7 @@ public class GameUI extends JFrame {
             textArea.append(response + "\n");
             System.out.println("Received response from server: " + response);
 
-            if (response.startsWith("Enter your name")) {
-                // String playerName = JOptionPane.showInputDialog(this, "Enter your name:");
-                if (playerName != null && !playerName.trim().isEmpty()) {
-                    // client.sendCommand("name " + playerName.trim());
-                }
-            } else if (response.startsWith("Your turn! Make a move!")) {
+             if (response.startsWith("Your turn! Make a move!")) {
                 isPlayerTurn = true;
                 startTime = System.currentTimeMillis();
                 timer.start();
@@ -210,29 +210,65 @@ public class GameUI extends JFrame {
                 isPlayerTurn = false;
                 timer.stop();
                 //JOptionPane.showMessageDialog(this, "It's the opponent's turn!");
-            }else if(response.startsWith("Game started!")){
+            } else if (response.startsWith("Game started!")) {
                 JOptionPane.showMessageDialog(this, response);
 
-            }else if(response.startsWith("Need two players to start the game.") ||
-                    response.startsWith("All players must place all ships before starting the game.") ){
+            } else if (response.startsWith("Need two players to start the game.") ||
+                    response.startsWith("All players must place all ships before starting the game.")) {
                 JOptionPane.showMessageDialog(this, response);
 
-            }else if (response.contains("Congratulations!") ||
-                    response.contains("Game over! The winner is")||
-                    response.contains("Game over due time up!")||
-                    response.contains("All your ships have been sunk!")){
-                isPlayerTurn= false;
-                gameOver=true;
-                JOptionPane.showMessageDialog(this, response);
-                timer.stop();
-
-            }else if(!gameOver && response.equals("Time's up! Your turn has ended.")) {
+            } else if (!gameOver && response.equals("Time's up! Your turn has ended.")) {
                 isPlayerTurn = false;
-                gameOver=true;
+                gameOver = true;
                 JOptionPane.showMessageDialog(this, "Time's up! Your turn has ended. You lost the game!");
                 timer.stop();
+                sendClearBords();
 
-            } else if (response.startsWith("Hit") || response.startsWith("Miss")) {
+            }else if (!gameOver && response.equals("Time's up! Your opponent's turn has ended.")) {
+                 isPlayerTurn = false;
+                 gameOver = true;
+                 JOptionPane.showMessageDialog(this, "Time's up! Your turn has ended.You have WON!");
+                 timer.stop();
+                 sendClearBords();
+
+             } else if (response.contains("Game over! The winner is") ||
+                    response.contains("Game over due time up!")) {
+                isPlayerTurn = false;
+                gameOver = true;
+                JOptionPane.showMessageDialog(this, response);
+                timer.stop();
+                sendClearBords();
+
+            } else if (response.contains("Congratulations!")) {
+                //colorez
+                String[] parts = response.split(" ");
+                String result = parts[0];
+                String coordinates = parts[1] + " " + parts[2];
+                updateGrid(result, coordinates);
+
+                // afisez game over
+                isPlayerTurn = false;
+                gameOver = true;
+                JOptionPane.showMessageDialog(this, response);
+                timer.stop();
+                sendClearBords();
+
+            } else if (response.contains("All your ships have been sunk!")){
+                //colorez ce mai aveam de colorat
+                String[] parts = response.split(" ");
+                int x = Integer.parseInt(parts[5]);
+                int y = Integer.parseInt(parts[6]);
+                boolean hit = parts[3].equals("hit");
+                updatePlayerGridOpponent(x, y, hit);
+
+                // afisez game over
+                isPlayerTurn = false;
+                gameOver = true;
+                JOptionPane.showMessageDialog(this, response);
+                timer.stop();
+                sendClearBords();
+
+            }else if (response.startsWith("Hit") || response.startsWith("Miss")) {
                 String[] parts = response.split(" ");
                 String result = parts[0];
                 String coordinates = parts[1] + " " + parts[2];
@@ -246,21 +282,21 @@ public class GameUI extends JFrame {
             }else if(response.startsWith("display board")){
                 sendDisplayBoard();
 
-            }else if(response.startsWith("Am afisat tabla cu opponent moves:")){
-                String boardState = response.substring("Am afisat tabla cu opponent moves: ".length());
-                System.out.println("MyBoard : " + boardState);
-                // updatePlayerGridWithOpponentMoves(boardState);
-
-            }else if(response.startsWith("display opponent move")){
-                // sendDisplayOpponentMove();
             }else if (response.startsWith("Your ship was")) {
                 String[] parts = response.split(" ");
                 int x = Integer.parseInt(parts[5]);
                 int y = Integer.parseInt(parts[6]);
                 boolean hit = parts[3].equals("hit");
                 updatePlayerGridOpponent(x, y, hit);
-            }else if(response.contains(" has joined the game!")){
-                  sendStartGame();
+
+            }else if(response.contains(" has joined the game!") ){
+                statusLabel.setText(response);
+                 isPlayerTurn = true;
+                sendStartGame();
+
+
+            }else if( response.contains("You joined the game with id")) {
+                statusLabel.setText(response);
             }
         });
     }
@@ -336,6 +372,11 @@ public class GameUI extends JFrame {
     }
     private void sendStartGame() {
         String command = "start game";
+        System.out.println("Sending command: " + command);
+        client.sendCommand(command);
+    }
+    private void sendClearBords() {
+        String command = "clear boards";
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }

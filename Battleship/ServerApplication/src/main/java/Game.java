@@ -33,6 +33,7 @@ public class Game {
         this.player2 = player2;
         this.players.add(player2);
         player1.sendMessage(player2.getName() + " has joined the game!");
+        player2.sendMessage("You have joined the game!");
     }
 
     public synchronized boolean allPlayersAreJoined() {
@@ -60,6 +61,7 @@ public class Game {
                 @Override
                 public void run() {
                     endGame(determineWinner());
+
 
                 }
             }, gameDurationMillis);
@@ -109,9 +111,11 @@ public class Game {
             long turnEndTime = System.currentTimeMillis();
             if (turnEndTime - turnStartTime >= 30000) {
                 currentPlayer.sendMessage("Time's up! Your turn has ended.");
+                opponentPlayer.sendMessage("Time's up! Your opponent's turn has ended.");
                 gameOver = true;
                 LosingPlayer = currentPlayer;
                 WinningPlayer = opponentPlayer;
+                player1Turn =!player1Turn;
             }
 
             if (hasPlayerMadeMove) {
