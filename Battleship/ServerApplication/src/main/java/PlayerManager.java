@@ -70,7 +70,7 @@ public class PlayerManager {
     }
 
     public void clearBoards() {
-        // board.clearBoard();
+        board.clearBoard();
         opponentViewBoard.clearBoard();
     }
 

@@ -47,13 +47,7 @@ public class Board {
         return false;
     }
 
-    public boolean checkShipSunk(int x, int y) {
-        if (grid[x][y] == 6) {
-            return false;
-        }
 
-        return true;
-    }
 
     public void updateCell(int x, int y, boolean hit) {
         grid[x][y] = hit ? 6 : -1;
@@ -64,11 +58,14 @@ public class Board {
     }
     public void clearBoard() {
         cellsSunk =0;
+        shipsPlaced=0;
+        cellOccupied = 0;
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 grid[i][j] = 0;
             }
         }
+
     }
     public boolean allShipsSunk() {
         return cellsSunk == cellOccupied;
