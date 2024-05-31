@@ -2,6 +2,7 @@ package gameInterface;
 
 import client.GameClient;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -21,23 +22,40 @@ public class MyBoardUIJoin extends JFrame {
     private ShipPanel[] ships;
     private int placedShipCount = 0;
     String playerName;
+    Color cadetGrey = Color.decode("#91A6AE");
+    Color delftBlue = Color.decode("#414163");
+    Color tyrianPurple = Color.decode("#471732");
+    Color taupeGray = Color.decode("#7A7885");
+    Color brown = Color.decode("#D4A276");
+    Color mintGreen = Color.decode("#CDF2EB");
+
 
     public MyBoardUIJoin(GameClient client, String playerName) {
         this.client = client;
         this.playerName = playerName;
         client.messageConsumer= this::handleServerResponse;
-
-
         setTitle("My Board");
         setSize(700, 700);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // setLayout(new BorderLayout());
 
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setPreferredSize(new Dimension(1200, 100));
+        titlePanel.setBackground(delftBlue);
+
+        JLabel titleLabel = new JLabel("Drag the ships tot the board!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 40));
+        titleLabel.setForeground(cadetGrey);
+
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
+
+
         // Creates the grid (MyBoard)
         gridPanel = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
-        gridPanel.setSize(new Dimension(CELL_SIZE * GRID_SIZE, CELL_SIZE * GRID_SIZE));
+        gridPanel.setSize(new Dimension(500, 500));
         gridPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        gridPanel.setBackground(Color.LIGHT_GRAY);
+        gridPanel.setBackground(brown);
         cells = new JPanel[GRID_SIZE][GRID_SIZE];
 
         // Dupa crearea gridului (MyBoard) si a adaugarii celulelor în gridPanel
@@ -56,7 +74,7 @@ public class MyBoardUIJoin extends JFrame {
         // Ships Panel
         JPanel shipsPanel = new JPanel();
         shipsPanel.setLayout(new BoxLayout(shipsPanel, BoxLayout.Y_AXIS));
-        shipsPanel.add(new JLabel("DRAG THE SHIPS"));
+        shipsPanel.setSize(new Dimension(260, 1200));
         // Ship types
         ships = new ShipPanel[9];
         ships[0] = new ShipPanel("Ship 1 DOWN", 1);
@@ -76,21 +94,28 @@ public class MyBoardUIJoin extends JFrame {
         }
 
         //Buttons Panel (Edit)
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 40, 10)); // Centrarea butoanelor
+        buttonPanel.setOpaque(true); // Sa fie transparent, pentru a vedea imaginea de fundal
+        buttonPanel.setBorder(new EmptyBorder(10, 20, 10, 20)); // Marginea panoului
 
-        buttonsPanel.add(new JLabel("  Edit your board:  "));
-        JButton removeShipButton = new JButton("Remove Ship");
-        JButton joinGameButton = new JButton("Join Game");
+        buttonPanel.add(new JLabel("Edit your board:  "));
+        buttonPanel.setFont(new Font("Serif", Font.BOLD, 10));
+        JButton removeShipButton = createButton("Remove Ship");
+        JButton joinGameButton = createButton("Join Game");
 
-        buttonsPanel.add(removeShipButton);
-        buttonsPanel.add(new JLabel("      If you are ready to play, press:  "));
-        buttonsPanel.add(joinGameButton);
+        buttonPanel.add(removeShipButton);
+        buttonPanel.add(new JLabel(" "));
+        buttonPanel.add(new JLabel("  If you are ready: "));
+        buttonPanel.add(joinGameButton);
+        buttonPanel.setBackground(Color.LIGHT_GRAY);
 
         //MAIN PANEL
+        add(titlePanel, BorderLayout.NORTH); // for the title
         add(gridPanel, BorderLayout.CENTER);
         add(shipsPanel, BorderLayout.EAST);
-        add(buttonsPanel, BorderLayout.SOUTH);
+        add(buttonPanel, BorderLayout.SOUTH);
+        setBackground(brown);
+
 
         setLocationRelativeTo(null); // for centering the window
         setVisible(true);
@@ -133,6 +158,79 @@ public class MyBoardUIJoin extends JFrame {
             }
         });
 
+    }
+    private JButton createButton(String text) {
+        RoundedButton button = new RoundedButton(text);
+        button.setPreferredSize(new Dimension(100, 40)); // Dimensiuni personalizate
+        return button;
+    }
+    // Clasă personalizata pentru butoane cu colturi rotunjite
+    private class RoundedButton extends JButton {
+        private Color pressedBackgroundColor;
+        private Color hoverBackgroundColor;
+
+        public RoundedButton(String text) {
+            super(text);
+            setContentAreaFilled(false);
+            setBackground(cadetGrey);
+            setForeground(tyrianPurple);
+            pressedBackgroundColor = taupeGray;
+            hoverBackgroundColor = mintGreen;
+            init();
+        }
+
+        private void init() {
+            addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    setBackground(hoverBackgroundColor);
+                }
+
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    setBackground(cadetGrey);
+                }
+            });
+
+            addChangeListener(e -> {
+                if (getModel().isPressed()) {
+                    setBackground(pressedBackgroundColor);
+                } else if (getModel().isRollover()) {
+                    setBackground(hoverBackgroundColor);
+                } else {
+                    setBackground(cadetGrey);
+                }
+            });
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            if (getModel().isArmed()) {
+                g.setColor(pressedBackgroundColor);
+            } else if (getModel().isRollover()) {
+                g.setColor(hoverBackgroundColor);
+            } else {
+                g.setColor(getBackground());
+            }
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+            g2.setColor(getForeground());
+            FontMetrics fm = g2.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(getText())) / 2;
+            int y = (getHeight() + fm.getAscent()) / 2 - 2;
+            g2.drawString(getText(), x, y);
+            g2.dispose();
+        }
+
+        @Override
+        protected void paintBorder(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getForeground());
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+            g2.dispose();
+        }
     }
 
     private void removeMouseListeners() {

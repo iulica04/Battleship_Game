@@ -115,7 +115,6 @@ public class Game {
                 gameOver = true;
                 LosingPlayer = currentPlayer;
                 WinningPlayer = opponentPlayer;
-                player1Turn =!player1Turn;
             }
 
             if (hasPlayerMadeMove) {
