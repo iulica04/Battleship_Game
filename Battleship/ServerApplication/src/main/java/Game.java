@@ -32,7 +32,7 @@ public class Game {
     public synchronized void addSecondPlayer(PlayerManager player2) {
         this.player2 = player2;
         this.players.add(player2);
-        player1.sendMessage(player2.getName() + " has joined the game! Enter 'set the ships positions' to set the ships positions!");
+        player1.sendMessage(player2.getName() + " has joined the game!");
     }
 
     public synchronized boolean allPlayersAreJoined() {

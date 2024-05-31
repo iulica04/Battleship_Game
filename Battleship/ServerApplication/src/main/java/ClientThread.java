@@ -52,6 +52,7 @@ public class ClientThread extends Thread {
             }
 
 
+
             Game game = null;
 
 
@@ -88,7 +89,7 @@ public class ClientThread extends Thread {
                     if (game != null) {
                         if (!game.allPlayersAreJoined()) {
                             game.addSecondPlayer(player);
-                            out.println("You joined the game with id " + gameId + "! Enter 'set the ships positions' to set the ships positions!");
+                            out.println("You joined the game with id " + gameId + "!");
                         } else {
                             out.println("Game" + gameId + " is already full!");
                         }
@@ -221,8 +222,8 @@ public class ClientThread extends Thread {
 
                         if (hit) {
                             if (opponent.allShipsSunk()) {
-                                out.println("Congratulations! You sank all opponent's ships!");
-                                opponent.sendMessage("All your ships have been sunk!");
+                                out.println("Hit "+ x +" " + y + " ! Congratulations! You sank all opponent's ships!");
+                                opponent.sendMessage("Your ship was miss at "+ x + " " + y + "! All your ships have been sunk!");
                                 opponent.clearBoards();
                                 player.clearBoards();
                             } else {

@@ -19,6 +19,7 @@ public class GameUI extends JFrame {
     private String playerName;
     private boolean isPlayerTurn = false;
     private boolean gameOver = false;
+    private JLabel statusLabel;
 
     public GameUI(GameClient client, String playerName) {
 
@@ -216,10 +217,10 @@ public class GameUI extends JFrame {
                     response.startsWith("All players must place all ships before starting the game.") ){
                 JOptionPane.showMessageDialog(this, response);
 
-            }else if (response.startsWith("Congratulations!") ||
+            }else if (response.contains("Congratulations!") ||
                     response.contains("Game over! The winner is")||
                     response.contains("Game over due time up!")||
-                    response.equals("All your ships have been sunk!")){
+                    response.contains("All your ships have been sunk!")){
                 isPlayerTurn= false;
                 gameOver=true;
                 JOptionPane.showMessageDialog(this, response);
@@ -258,6 +259,8 @@ public class GameUI extends JFrame {
                 int y = Integer.parseInt(parts[6]);
                 boolean hit = parts[3].equals("hit");
                 updatePlayerGridOpponent(x, y, hit);
+            }else if(response.contains(" has joined the game!")){
+                  sendStartGame();
             }
         });
     }
@@ -331,8 +334,8 @@ public class GameUI extends JFrame {
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }
-    private void sendDisplayOpponentMove() {
-        String command = "display opponent move";
+    private void sendStartGame() {
+        String command = "start game";
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }
@@ -343,7 +346,4 @@ public class GameUI extends JFrame {
         System.exit(0);
     }
 
-    /*public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> PlayerScreen(client, playerName));
-    }*/
 }

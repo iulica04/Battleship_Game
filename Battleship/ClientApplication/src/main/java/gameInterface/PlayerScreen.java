@@ -71,7 +71,7 @@ public class PlayerScreen extends JFrame {
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(() -> new JoinGameScreen(client));
+                SwingUtilities.invokeLater(() -> new MyBoardUIJoin(client, playerName));
                 dispose();
             }
         });
@@ -113,7 +113,7 @@ public class PlayerScreen extends JFrame {
         }
     }
 
-    // Clasă personalizată pentru butoane cu colțuri rotunjite
+    // Clasă personalizata pentru butoane cu colturi rotunjite
     private class RoundedButton extends JButton {
         private Color pressedBackgroundColor;
         private Color hoverBackgroundColor;
