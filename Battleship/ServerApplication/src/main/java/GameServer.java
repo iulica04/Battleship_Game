@@ -39,6 +39,10 @@ public class GameServer {
         return gameManager.getGameId();
     }
 
+    public List<String> getAllGames() {
+        return gameManager.getAllGames();
+    }
+
     public void start() {
         try {
             serverSocket = new ServerSocket(port);

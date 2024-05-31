@@ -16,6 +16,7 @@ public class GameUI extends JFrame {
 
     public GameUI(GameClient client) {
         this.client = client;
+        client.setMessageConsumer(this::handleServerResponse);
         // main farme
         setTitle("Battleship Game");
         setSize(800, 600);

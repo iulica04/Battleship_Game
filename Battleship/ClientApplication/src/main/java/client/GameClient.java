@@ -44,6 +44,15 @@ public class GameClient {
     public void sendCommand(String command) {
         out.println(command);
     }
+
+    public Consumer<String> getMessageConsumer() {
+        return messageConsumer;
+    }
+
+    public void setMessageConsumer(Consumer<String> messageConsumer) {
+        this.messageConsumer = messageConsumer;
+    }
+
     public void close() {
         try {
             if (socket != null) {
@@ -58,6 +67,8 @@ public class GameClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 
 

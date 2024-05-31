@@ -69,6 +69,13 @@ public class PlayerScreen extends JFrame {
             }
         });
         JButton button2 = createButton("Join Game");
+        button2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> new JoinGameScreen(client));
+                dispose();
+            }
+        });
         JButton button3 = createButton("My History");
         JButton button4 = createButton("Ranking");
         JButton button5 = createButton("Exit");

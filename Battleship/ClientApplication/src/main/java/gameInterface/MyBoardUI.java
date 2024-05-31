@@ -22,7 +22,9 @@ public class MyBoardUI extends JFrame {
     private ShipPanel[] ships;
     private int placedShipCount = 0;
 
-    public MyBoardUI(String serverAddress, int serverPort) {
+    public MyBoardUI(GameClient client) {
+        this.client = client;
+
         setTitle("My Board");
         setSize(700, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -125,12 +127,7 @@ public class MyBoardUI extends JFrame {
 
 
         // server connection
-        try {
-            client = new GameClient(serverAddress, serverPort, this::handleServerResponse);
-            client.connect();
-        } catch (IOException e) {
-            System.out.println("Could not connect to server: " + e.getMessage());
-        }
+
     }
 
     // Metoda pentru a elimina toți listenerii de mouse de pe celule după ce o barcă a fost ștearsă
@@ -447,7 +444,4 @@ public class MyBoardUI extends JFrame {
         });
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new MyBoardUI("localhost", 12345));
-    }
 }
