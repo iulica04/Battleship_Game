@@ -215,34 +215,30 @@ public class ClientThread extends Thread {
                     }
 
                     if (game != null) {
-                        Player opponent;
-                        if(game.isPlayer1Turn()==true){
-                           opponent = game.getPlayer2();
-                        }else{
-                            opponent = game.getPlayer1();
-                        }
-
+                        Player opponent = game.isPlayer1Turn() ? game.getPlayer2() : game.getPlayer1();
                         boolean hit = game.makeMove(x, y, opponent);
+
                         if (hit) {
                             if (opponent.allShipsSunk()) {
-                                System.out.println("Comanda este " + inputLine);
-                                out.println( "Congratulations!" );
-                                //curatam tablele dupa joc
+                                out.println("Congratulations! You sank all opponent's ships!");
+                                opponent.sendMessage("All your ships have been sunk!");
                                 opponent.clearBoards();
                                 player.clearBoards();
-
-                        }else{
-                                out.println("Hit "+ x +" " + y + " ! " + player.getName() + "'s turn again." + "Time left for game " );
+                            } else {
+                                out.println("Hit "+ x +" " + y + " ! " + player.getName() + "'s turn again." );
+                                opponent.sendMessage("Your ship was hit at "+ x + " " + y + " !");
                             }
                         } else {
-                            out.println("Miss " + x +" "+ y + " . "+ opponent.getName() + "'s turn." + "Time left for game " );
+                            out.println("Miss " + x +" "+ y + " . "+ opponent.getName() + "'s turn." );
+                            opponent.sendMessage("Your ship was miss at "+ x + " " + y + " , but " + player.getName() + " missed!");
                         }
+
+
                     } else {
                         out.println("Invalid game!");
                     }
 
-
-                }  else if (inputLine.equals("status")) {
+                } else if (inputLine.equals("status")) {
                     GameManager gameManager;
                     if (game == null) {
                         out.println( "Player is not in any game.");
@@ -259,6 +255,17 @@ public class ClientThread extends Thread {
 
                         out.println("Am afisat opponent's view" + (player.displayOpponentView()));
 
+                }else if(inputLine.equals("display opponent move")) {
+                    if (game != null) {
+                        Player opponent;
+                        if (game.isPlayer1Turn() == true) {
+                            opponent = game.getPlayer2();
+                        } else {
+                            opponent = game.getPlayer1();
+                        }
+                        out.println("Am afisat tabla cu opponent moves: " + opponent.displayOpponentView());
+
+                    }
                 }else if (inputLine.equals("exit")) {
                     break;
 
