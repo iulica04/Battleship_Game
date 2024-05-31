@@ -38,6 +38,7 @@ public class Board {
         return true;
     }
 
+
     public boolean attackCell(int x, int y) {
         if (grid[x][y] == 1) {
             cellsSunk++;

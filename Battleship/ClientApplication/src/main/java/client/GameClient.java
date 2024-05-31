@@ -13,7 +13,7 @@ public class GameClient {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private Consumer<String> messageConsumer;
+    public Consumer<String> messageConsumer;
 
     public GameClient(String host, int port, Consumer<String> messageConsumer) {
         this.host = host;

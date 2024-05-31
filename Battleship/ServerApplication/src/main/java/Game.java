@@ -128,14 +128,18 @@ public class Game {
         if (winner.equals("It's a tie!")) {
             player1.sendMessage("Game over! It's a tie!");
             player2.sendMessage("Game over! It's a tie!");
+
         }else if(winner.equals("Time's up! ")) {
             if(LosingPlayer.equals(player1)) {
-                player1.sendMessage("Game over! The winner is " + player2.getName());
-                player2.sendMessage("Game over! The winner is " + player2.getName());
+                player1.sendMessage("Game over due time up! The winner is " + player2.getName());
+                player2.sendMessage("Game over due time up! The winner is " + player2.getName());
             }else{
-                player1.sendMessage("Game over! The winner is " + player1.getName());
-                player2.sendMessage("Game over! The winner is " + player1.getName());
+                player1.sendMessage("Game over  due time up! The winner is " + player1.getName());
+                player2.sendMessage("Game over  due time up! The winner is " + player1.getName());
             }
+            //Daca timpul s-a scurs si s-a terminat jocul atunci se sterg toate tablele jucatorilor
+            player1.clearBoards();
+            player2.clearBoards();
         }
         else {
             player1.sendMessage("Game over! The winner is " + winner);
@@ -159,44 +163,6 @@ public class Game {
             return "It's a tie!";
         }
     }
-
-
-
-/*
-    public String printBoard(Player player) {
-        char[][] board = player.equals(player1) ? board1.getBoard() : board2.getBoard();
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Player ").append(player.getName()).append("'s entity.Board:\n");
-        sb.append("    ");
-        for (int i = 0; i < 10; i++) {
-            sb.append(" ").append((char) ('A' + i)).append(" ");
-        }
-        sb.append("\n");
-
-        sb.append("   +");
-        for (int i = 0; i < 10; i++) {
-            sb.append("---+");
-        }
-        sb.append("\n");
-
-        for (int i = 0; i < 10; i++) {
-            sb.append(String.format("%2d |", i + 1));
-            for (int j = 0; j < 10; j++) {
-
-                sb.append(" ").append(board[i][j]).append(" |");
-            }
-            sb.append("\n");
-
-            sb.append("   +");
-            for (int j = 0; j < 10; j++) {
-                sb.append("---+");
-            }
-            sb.append("\n");
-        }
-
-        return sb.toString();
-    }*/
 
 
 

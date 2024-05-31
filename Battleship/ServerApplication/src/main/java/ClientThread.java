@@ -13,6 +13,7 @@ public class ClientThread extends Thread {
     private GameServer server;
     private PlayerManager player;
     private boolean running = false;
+    private int totalOfShips = 0;
 
     public ClientThread(Socket clientSocket, GameServer server) {
         this.clientSocket = clientSocket;
@@ -150,7 +151,7 @@ public class ClientThread extends Thread {
 
                     out.println("Ships positions set! Now you can start the game! Use 'start game' command to start the game!");
 
-                } else if (inputLine.startsWith("place ship")) {
+                } else if (inputLine.startsWith("place ship") ) {
 
                     try {
                         String[] parts = inputLine.split(" ");
@@ -159,21 +160,28 @@ public class ClientThread extends Thread {
                         int x2 = Integer.parseInt(parts[4]);
                         int y2 = Integer.parseInt(parts[5]);
 
-                        if ((x1 == x2 && y1 > y2) || (y1 == y2 && x1 > x2)) {
-                            out.println("Invalid coordinates, must be (x1==x2 && y1 <= y2) || (y1==y2 && x1 <= x2).");
-                        } else {
-                            boolean success = player.getBoard().placeShip(x1, y1, x2, y2);
-                            if (success) {
-                                out.println("Ship placed. Am afisat tabla de joc aici: " + player.displayBoard());
-                            } else {
-                                out.println("Failed to place ship.");
+                        if((x1==x2 && y1 >y2) || (y1==y2 && x1 >x2)){
+                            out.println( "Invalid coordinates, must be (x1==x2 && y1 <= y2) || (y1==y2 && x1 <= x2).");
+                        }else {
+                            if(totalOfShips < 5){
+                                boolean success = player.getBoard().placeShip(x1, y1, x2, y2);
+                                if (success) {
+                                    totalOfShips++;
+                                    out.println("Ship placed. Am afisat tabla de joc aici: " + player.displayBoard());
+                                } else {
+                                    out.println( "Failed to place ship.");
+                                }
+                            }else{
+                                out.println("You can't place more than 5 ships.");
                             }
                         }
                     } catch (NumberFormatException e) {
-                        out.println("Invalid coordinates.");
+                        out.println( "Invalid coordinates.");
                     }
 
-                } else if (inputLine.startsWith("delete ship")) {
+
+
+                } else if (inputLine.startsWith("delete ship") ) {
 
                     try {
                         String[] parts = inputLine.split(" ");
@@ -182,19 +190,20 @@ public class ClientThread extends Thread {
                         int x2 = Integer.parseInt(parts[4]);
                         int y2 = Integer.parseInt(parts[5]);
 
-                        if ((x1 == x2 && y1 > y2) || (y1 == y2 && x1 > x2)) {
-                            out.println("Invalid coordinates, must be (x1==x2 && y1 <= y2) || (y1==y2 && x1 <= x2).");
-                        } else {
+                        if((x1==x2 && y1 >y2) || (y1==y2 && x1 >x2)){
+                            out.println( "Invalid coordinates, must be (x1==x2 && y1 <= y2) || (y1==y2 && x1 <= x2).");
+                        }else {
                             boolean success = player.getBoard().deleteShip(x1, y1, x2, y2);
                             if (success) {
-                                out.println("Ship deleted. Am afisat tabla de joc aici: " + player.displayBoard());
+                                out.println( "Ship deleted. Am afisat tabla de joc aici: " + player.displayBoard());
                             } else {
-                                out.println("Failed to delete ship.");
+                                out.println( "Failed to delete ship.");
                             }
                         }
                     } catch (NumberFormatException e) {
-                        out.println("Invalid coordinates.");
+                        out.println( "Invalid coordinates.");
                     }
+
 
                 } else if (inputLine.contains("make move")) {
                     String[] parts = inputLine.split(" ");
@@ -207,27 +216,29 @@ public class ClientThread extends Thread {
                     }
 
                     if (game != null) {
-                        PlayerManager opponent;
-                        if (game.isPlayer1Turn()) {
-                            opponent = game.getPlayer2();
-                        } else {
-                            opponent = game.getPlayer1();
-                        }
-
+                        PlayerManager opponent = game.isPlayer1Turn() ? game.getPlayer2() : game.getPlayer1();
                         boolean hit = game.makeMove(x, y, opponent);
+
                         if (hit) {
                             if (opponent.allShipsSunk()) {
-                                System.out.println("Comanda este " + inputLine);
-                                out.println("Congratulations!");
+                                out.println("Congratulations! You sank all opponent's ships!");
+                                opponent.sendMessage("All your ships have been sunk!");
+                                opponent.clearBoards();
+                                player.clearBoards();
                             } else {
-                                out.println("Hit " + x + " " + y + " ! " + player.getName() + "'s turn again." + "Time left for game ");
+                                out.println("Hit "+ x +" " + y + " ! " + player.getName() + "'s turn again." );
+                                opponent.sendMessage("Your ship was hit at "+ x + " " + y + " !");
                             }
                         } else {
-                            out.println("Miss " + x + " " + y + " . " + opponent.getName() + "'s turn." + "Time left for game ");
+                            out.println("Miss " + x +" "+ y + " . "+ opponent.getName() + "'s turn." );
+                            opponent.sendMessage("Your ship was miss at "+ x + " " + y + " , but " + player.getName() + " missed!");
                         }
+
+
                     } else {
                         out.println("Invalid game!");
                     }
+
                 } else if (inputLine.equals("status")) {
                     GameManager gameManager;
                     if (game == null) {

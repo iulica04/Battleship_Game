@@ -27,7 +27,6 @@ public class PlayerScreen extends JFrame {
     Color mintGreen = Color.decode("#CDF2EB");
 
     public PlayerScreen(GameClient client, String playerName) {
-
         this.playerName = playerName;
         this.client = client;
 
@@ -64,7 +63,7 @@ public class PlayerScreen extends JFrame {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(() -> new GameUI(client));
+                SwingUtilities.invokeLater(() -> new MyBoardUI(client, playerName));
                 dispose();
             }
         });
@@ -182,5 +181,4 @@ public class PlayerScreen extends JFrame {
             g2.dispose();
         }
     }
-
 }
