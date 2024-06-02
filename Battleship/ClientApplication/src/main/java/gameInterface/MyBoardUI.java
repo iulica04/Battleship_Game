@@ -21,6 +21,7 @@ public class MyBoardUI extends JFrame {
     private ShipPanel[] ships;
     private int placedShipCount = 0;
     String playerName;
+    String task;
     Color cadetGrey = Color.decode("#91A6AE");
     Color delftBlue = Color.decode("#414163");
     Color tyrianPurple = Color.decode("#471732");
@@ -28,10 +29,11 @@ public class MyBoardUI extends JFrame {
     Color brown = Color.decode("#D4A276");
     Color mintGreen = Color.decode("#CDF2EB");
 
-    public MyBoardUI(GameClient client, String playerName) {
+    public MyBoardUI(GameClient client, String playerName, String task) {
         this.client = client;
         this.playerName = playerName;
-        client.messageConsumer= this::handleServerResponse;
+        this.task = task;
+        client.setMessageConsumer(this::handleServerResponse);
 
 
         setTitle("My Board");
@@ -152,20 +154,26 @@ public class MyBoardUI extends JFrame {
         startButton.addActionListener(e -> {
             if (placedShipCount >= 5) {
                 dispose();
-                SwingUtilities.invokeLater(() -> new GameUI(client, playerName));
+                if (task.equals("create game")) {
+                    SwingUtilities.invokeLater(() -> new GameUI(client, playerName));
+                    handleServerResponse("create game");
+                } else {
+                    SwingUtilities.invokeLater(() -> new JoinGameScreen(client));
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Not all ships placed!");
             }
         });
 
-        handleServerResponse("create game");
+
     }
     private JButton createButton(String text) {
         RoundedButton button = new RoundedButton(text);
         button.setPreferredSize(new Dimension(100, 40)); // Dimensiuni personalizate
         return button;
     }
-    // Clasă personalizata pentru butoane cu colturi rotunjite
+
+    // Clasa personalizata pentru butoane cu colturi rotunjite
     private class RoundedButton extends JButton {
         private Color pressedBackgroundColor;
         private Color hoverBackgroundColor;
@@ -281,7 +289,7 @@ public class MyBoardUI extends JFrame {
 
     private void sendCommandRemoveShip(int x1, int y1, int x2, int y2) {
         String command = "delete ship " + x1 + " " + y1 + " " + x2 + " " + y2;
-        System.out.println("Sending command: " + command);
+        // System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }
 
@@ -462,7 +470,7 @@ public class MyBoardUI extends JFrame {
                             }
 
                             String shipPosition = String.format("%d %d %d %d", row, col, row + shipSize - 1, col);
-                            System.out.println("Ship position: " + shipPosition);
+                            //   System.out.println("Ship position: " + shipPosition);
                             sendCommandSetPositions(row, col, row + shipSize - 1, col, shipName);
                             placedShipCount++;
 
@@ -474,7 +482,7 @@ public class MyBoardUI extends JFrame {
                             }
 
                             String shipPosition = String.format("%d %d %d %d", row, col, row, col + shipSize - 1);
-                            System.out.println("Ship position: " + shipPosition);
+                            // System.out.println("Ship position: " + shipPosition);
                             sendCommandSetPositions(row, col, row, col + shipSize - 1, shipName);
                             placedShipCount++;
 
@@ -508,10 +516,10 @@ public class MyBoardUI extends JFrame {
 
     private void checkGameStatus() {
         if (placedShipCount >= 5) {
-            System.out.println("All ships placed! You may now play the game!");
+            //    System.out.println("All ships placed! You may now play the game!");
             JOptionPane.showMessageDialog(this, "All ships placed!");
         } else {
-            System.out.println("Not all ships placed!");
+            //   System.out.println("Not all ships placed!");
             JOptionPane.showMessageDialog(this, "Not all ships placed!");
         }
     }
@@ -530,14 +538,14 @@ public class MyBoardUI extends JFrame {
 
     private void sendCommandSetPositions(int x1, int y1, int x2, int y2, String shipName) {
         String command = "place ship " + x1 + " " + y1 + " " + x2 + " " + y2;
-        System.out.println("Sending move: " + command);
+        //    System.out.println("Sending move: " + command);
         client.sendCommand(command);
     }
 
 
     private void handleServerResponse(String response) {
         SwingUtilities.invokeLater(() -> {
-            System.out.println("Received response from server: " + response);
+            //    System.out.println("Received response from server: " + response);
 
             if (response.startsWith("Enter your name")) {
                 // playerName = JOptionPane.showInputDialog(this, "Enter your name:");
@@ -545,11 +553,11 @@ public class MyBoardUI extends JFrame {
                     //   client.sendCommand("name " + playerName.trim());
                 }
             } else if (response.startsWith("You can't place more than 5 ships.")) {
-                System.out.println("Ship placed.");
+                //    System.out.println("Ship placed.");
 
             } else if (response.startsWith("create game")) {
                 sendCommandCreateGame();
-                System.out.println("Game created");
+                //  System.out.println("Game created");
             }
 
         });
@@ -557,7 +565,7 @@ public class MyBoardUI extends JFrame {
 
     private void sendCommandCreateGame() {
         String command = "create game";
-        System.out.println("Sending move: " + command);
+        // System.out.println("Sending move: " + command);
         client.sendCommand(command);
     }
 

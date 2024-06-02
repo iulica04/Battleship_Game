@@ -26,7 +26,7 @@ public class GameUI extends JFrame {
 
         this.playerName = playerName;
         this.client = client;
-        client.messageConsumer= this::handleServerResponse;
+        client.setMessageConsumer(this::handleServerResponse);
 
 
         setTitle("Battleship Game");
@@ -262,7 +262,7 @@ public class GameUI extends JFrame {
                     updateGrid(result, coordinates);
                 } else if (response.startsWith("Am afisat tabla de joc aici:")) {
                     String boardState = response.substring("Am afisat tabla de joc aici: ".length());
-                    System.out.println("MyBoard : " + boardState);
+                    //    System.out.println("MyBoard : " + boardState);
                     updatePlayerGrid(boardState);
                 } else if (response.startsWith("display board")) {
                     sendDisplayBoard();

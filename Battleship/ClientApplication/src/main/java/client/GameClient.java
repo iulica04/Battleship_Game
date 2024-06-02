@@ -13,7 +13,9 @@ public class GameClient {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    public Consumer<String> messageConsumer;
+
+    private String username;
+    private Consumer<String> messageConsumer;
 
     public GameClient(String host, int port, Consumer<String> messageConsumer) {
         this.host = host;
@@ -67,9 +69,14 @@ public class GameClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
 }

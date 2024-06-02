@@ -1,6 +1,7 @@
 package gameInterface;
 
 import client.GameClient;
+import gameInterface.elements.RoundedButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +38,7 @@ public class PlayerScreen extends JFrame {
         }
 
         setTitle("Player Screen");
-        setSize(1000, 700);
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -63,7 +64,7 @@ public class PlayerScreen extends JFrame {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(() -> new MyBoardUI(client, playerName));
+                SwingUtilities.invokeLater(() -> new MyBoardUI(client, playerName, "create game"));
                 dispose();
             }
         });
@@ -71,7 +72,7 @@ public class PlayerScreen extends JFrame {
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(() -> new MyBoardUIJoin(client, playerName));
+                SwingUtilities.invokeLater(() -> new MyBoardUI(client, playerName, "join game"));
                 dispose();
             }
         });
@@ -114,71 +115,7 @@ public class PlayerScreen extends JFrame {
     }
 
     // Clasă personalizata pentru butoane cu colturi rotunjite
-    private class RoundedButton extends JButton {
-        private Color pressedBackgroundColor;
-        private Color hoverBackgroundColor;
 
-        public RoundedButton(String text) {
-            super(text);
-            setContentAreaFilled(false);
-            setBackground(cadetGrey);
-            setForeground(tyrianPurple);
-            pressedBackgroundColor = taupeGray;
-            hoverBackgroundColor = mintGreen;
-            init();
-        }
 
-        private void init() {
-            addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    setBackground(hoverBackgroundColor);
-                }
 
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent evt) {
-                    setBackground(cadetGrey);
-                }
-            });
-
-            addChangeListener(e -> {
-                if (getModel().isPressed()) {
-                    setBackground(pressedBackgroundColor);
-                } else if (getModel().isRollover()) {
-                    setBackground(hoverBackgroundColor);
-                } else {
-                    setBackground(cadetGrey);
-                }
-            });
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            if (getModel().isArmed()) {
-                g.setColor(pressedBackgroundColor);
-            } else if (getModel().isRollover()) {
-                g.setColor(hoverBackgroundColor);
-            } else {
-                g.setColor(getBackground());
-            }
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-            g2.setColor(getForeground());
-            FontMetrics fm = g2.getFontMetrics();
-            int x = (getWidth() - fm.stringWidth(getText())) / 2;
-            int y = (getHeight() + fm.getAscent()) / 2 - 2;
-            g2.drawString(getText(), x, y);
-            g2.dispose();
-        }
-
-        @Override
-        protected void paintBorder(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getForeground());
-            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
-            g2.dispose();
-        }
-    }
 }

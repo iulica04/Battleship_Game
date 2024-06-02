@@ -1,148 +1,167 @@
 package gameInterface;
-import client.GameClient;
 
-import javax.imageio.ImageIO;
+import client.GameClient;
+import gameInterface.elements.RoundedButton;
+
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
-public class JoinGameScreen extends JFrame  {
-    GameClient client;
-    private JTextField idGameField; // Added to make it accessible in handleServerResponse
-    String playerName;
+public class JoinGameScreen extends JFrame {
+    private GameClient client;
+    private JList<String> gamesList;
+    private JTextField searchField;
+    Color cadetGrey = Color.decode("#91A6AE");
+    Color tyrianPurple = Color.decode("#471732");
+    Color taupeGray = Color.decode("#7A7885");
+    Color mintGreen = Color.decode("#CDF2EB");
+    Color delftBlue = Color.decode("#414163");
 
-        public JoinGameScreen(GameClient client, String playerName) {
-            this.client = client;
-            this.playerName = playerName;
-            client.messageConsumer = this::handleServerResponse;
+    public JoinGameScreen(GameClient client) {
+        this.client = client;
+        client.setMessageConsumer(this::handleServerResponse);
 
-            //COLORS
-            Color cerulean = Color.decode("#1C6989");
-            Color lightBlue = Color.decode("#96C1CE");
-            Color cosmicLatte = Color.decode("#FEFAEA");
-            Color outerSpace = Color.decode("#455257");
-            Color rawUmber = Color.decode("#956536");
-            Color cadetGrey = Color.decode("#91A6AE");
+        setTitle("Join Game");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            setTitle("Join Game");
-            setSize(1200, 600);
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setLayout(new BorderLayout());
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setPreferredSize(new Dimension(1200, 100));
+        titlePanel.setBackground(delftBlue);
 
-            JPanel welcomePanel = new JPanel();
-            welcomePanel.setLayout(new BorderLayout());
-            welcomePanel.setPreferredSize(new Dimension(800, 400));
-            welcomePanel.setBackground(cerulean);
+        JLabel titleLabel = new JLabel("Available games", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 40));
+        titleLabel.setForeground(cadetGrey);
 
-            JLabel welcomeLabel = new JLabel("Join Game!", SwingConstants.CENTER);
-            welcomeLabel.setFont(new Font("Serif", Font.BOLD, 40));
-            welcomeLabel.setForeground(cosmicLatte);
-            welcomeLabel.setPreferredSize(new Dimension(600, 100));
-            welcomePanel.add(welcomeLabel, BorderLayout.CENTER);
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
 
-            JPanel namePanel = new JPanel();
-            namePanel.setLayout(new BoxLayout(namePanel, BoxLayout.Y_AXIS));
-            namePanel.setBorder(new EmptyBorder(20, 60, 20, 60));
-            namePanel.setBackground(lightBlue);
+        // Panou de căutare
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchField = new JTextField();
+        JButton searchButton = createButton("Search");
+        searchButton.addActionListener(e -> searchGameById());
 
-            JLabel nameLabel = new JLabel("Enter the id of the game you want to join:");
-            nameLabel.setFont(new Font("Serif", Font.BOLD, 30));
-            nameLabel.setBorder(new EmptyBorder(0, 60, 20, 0));
-            nameLabel.setForeground(Color.WHITE);
+        // Adăugare buton de refresh
+        JButton refreshButton = createButton("\u21BB");
+        refreshButton.setPreferredSize(new Dimension(50, 30));
+        refreshButton.addActionListener(e -> client.sendCommand("list_games"));
 
-            idGameField = new JTextField(20); // Initialize nameField
-            idGameField.setFont(new Font("Serif", Font.PLAIN, 20));
-            idGameField.setPreferredSize(new Dimension(100, 40));
-            idGameField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
-            namePanel.add(nameLabel);
-            namePanel.add(idGameField);
+        JPanel searchAndRefreshPanel = new JPanel(new BorderLayout());
+        searchAndRefreshPanel.add(searchField, BorderLayout.CENTER);
+        searchAndRefreshPanel.add(searchButton, BorderLayout.EAST);
 
+        searchPanel.add(searchAndRefreshPanel, BorderLayout.CENTER);
+        searchPanel.add(refreshButton, BorderLayout.WEST);
 
-            welcomePanel.add(namePanel, BorderLayout.SOUTH);
+        mainPanel.add(searchPanel, BorderLayout.NORTH);
 
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 50));
-            buttonPanel.setBackground(cosmicLatte);
+        gamesList = new JList<>();
+        gamesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(gamesList);
+        gamesList.setFixedCellHeight(50);
 
-            JButton startButton = new JButton("Join Game");
-            startButton.setFont(new Font("Serif", Font.BOLD, 20));
-            startButton.setForeground(rawUmber);
-            startButton.setBackground(cadetGrey);
-            Border border = BorderFactory.createCompoundBorder(
-                    new LineBorder(Color.BLACK, 1, true),
-                    new EmptyBorder(10, 20, 10, 20)
-            );
-            startButton.setBorder(border);
-            startButton.setPreferredSize(new Dimension(200, 50));
-            startButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String command = "join game " + idGameField.getText();
-                    if ((idGameField.getText()).isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Please enter an id for a game!", "Error", JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        // Send id game to the server
-                        client.sendCommand(command.trim());
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-                    }
+        // Panou de butoane
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
+        JButton joinButton = createButton("Join Selected Game");
+        joinButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedGame = gamesList.getSelectedValue();
+                if (selectedGame != null) {
+                    String[] parts = selectedGame.split(" ");
+                    String gameId = parts[2];
+                    String command = "join game " + gameId;
+                    System.out.println("Sending command: " + command);
+                    client.sendCommand(command);
+                    // dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please select a game to join", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            });
-            buttonPanel.add(startButton);
-
-
-            JPanel rightPanel = new JPanel();
-            rightPanel.setLayout(new BorderLayout());
-            rightPanel.add(welcomePanel, BorderLayout.NORTH);
-            rightPanel.add(buttonPanel, BorderLayout.CENTER);
-
-            JPanel imagePanel = new JPanel();
-            imagePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-            imagePanel.setBackground(Color.WHITE);
-
-            BufferedImage originalImage = null;
-            try {
-                originalImage = ImageIO.read(new File("Battleship/ClientApplication/src/main/resources/utils/animated-scene-fleet-of-ships-engaging-in-naval-warfare-illuminated-by-explosions-missile-impacts.bmp"));
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        });
 
-            if (originalImage != null) {
-                JLabel imageLabel = new JLabel(new ImageIcon(originalImage));
-                imagePanel.add(imageLabel);
-            }
-
-            JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, imagePanel, rightPanel);
-            splitPane.setDividerSize(0); // Set divider size to 0 to hide the divider
-
-            add(splitPane, BorderLayout.CENTER);
-
-            setLocationRelativeTo(null);
-            setVisible(true);
-        }
-
-        private void handleServerResponse(String response) {
-            System.out.println("Received response from server: " + response);
-
-             if (response.startsWith("Invalid game id!")) {
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(null, "Invalid name. Please enter your name again.", "Error", JOptionPane.ERROR_MESSAGE);
-                    //playerName = null; // Reset playerName
-                    idGameField.setText(""); // Clear the name field
-                });
-            } else if (response.startsWith("You joined the game with id")) {
-                SwingUtilities.invokeLater(() -> {
-                    new GameUI(client, playerName);
+        JButton randomButton = createButton("Random Game");
+        randomButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String[] games = new String[gamesList.getModel().getSize()];
+                for (int i = 0; i < gamesList.getModel().getSize(); i++) {
+                    games[i] = gamesList.getModel().getElementAt(i);
+                }
+                if (games.length > 0) {
+                    String randomGame = games[(int) (Math.random() * games.length)];
+                    client.sendCommand("join " + randomGame);
                     dispose();
-                });
+                } else {
+                    JOptionPane.showMessageDialog(null, "No games available to join", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        buttonPanel.add(joinButton);
+        buttonPanel.add(randomButton);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        add(titlePanel, BorderLayout.NORTH);
+        add(mainPanel);
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        // Request the list of games from the server
+        client.sendCommand("list_games");
+    }
+
+    private void searchGameById() {
+        String gameId = searchField.getText().trim();
+        if (!gameId.isEmpty()) {
+            String[] games = new String[gamesList.getModel().getSize()];
+            for (int i = 0; i < gamesList.getModel().getSize(); i++) {
+                games[i] = gamesList.getModel().getElementAt(i);
+            }
+            boolean found = Arrays.stream(games).anyMatch(game -> game.contains(gameId));
+            if (found) {
+                String[] filteredGames = Arrays.stream(games).filter(game -> game.contains(gameId)).toArray(String[]::new);
+                gamesList.setListData(filteredGames);
+            } else {
+                JOptionPane.showMessageDialog(this, "Game not found", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
 
+    public void handleServerResponse(String response) {
+        System.out.println("Received response: " + response);
+        if (response.startsWith("games_list")) {
+            response = response.chars()
+                    .filter(c -> c != '[' && c != ']')
+                    .mapToObj(c -> String.valueOf((char) c))
+                    .collect(Collectors.joining());
+
+            String[] games = response.substring(10).split(", ");
+            SwingUtilities.invokeLater(() -> updateGamesList(games));
+        } else if (response.contains("You joined the game")) {
+            SwingUtilities.invokeLater(() -> new GameUI(client, client.getUsername()));
+        } else {
+            JOptionPane.showMessageDialog(this, response, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private JButton createButton(String text) {
+        RoundedButton button = new RoundedButton(text);
+        button.setPreferredSize(new Dimension(150, 40)); // Dimensiuni personalizate
+        return button;
+    }
+
+    public void updateGamesList(String[] games) {
+        gamesList.setListData(games);
+    }
 }
