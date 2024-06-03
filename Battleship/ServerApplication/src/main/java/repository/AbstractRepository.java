@@ -56,5 +56,15 @@ public abstract class AbstractRepository<T> {
         em.getTransaction().commit();
     }
 
+    public void deleteByName(String name) {
+        EntityManager em = DatabaseEntity.getEntityManager();
+        List<T> entities = findByName(name);
+        em.getTransaction().begin();
+        for (T entity : entities) {
+            em.remove(entity);
+        }
+        em.getTransaction().commit();
+    }
+
 }
 

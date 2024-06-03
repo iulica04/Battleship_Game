@@ -39,8 +39,8 @@ public class PlayerManager {
         out.println(message);
     }
 
-    public Socket getSocket() {
-        return socket;
+    public void deletePlayer() {
+        playerRepository.deleteByName(player.getName());
     }
 
     public boolean getLastMoveHit() {

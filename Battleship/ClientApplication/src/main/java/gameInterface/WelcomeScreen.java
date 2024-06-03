@@ -58,7 +58,6 @@ public class WelcomeScreen extends JFrame {
         JLabel titleLabel = new JLabel("<html>Welcome to <br> Battleship Game!</html>", JLabel.CENTER);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 40));
         titleLabel.setForeground(Color.WHITE);
-
         titlePanel.add(titleLabel, BorderLayout.CENTER);
 
         backgroundImagePanel.add(titlePanel);

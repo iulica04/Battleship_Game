@@ -81,6 +81,13 @@ public class PlayerScreen extends JFrame {
         JButton button3 = createButton("My History");
         JButton button4 = createButton("Ranking");
         JButton button5 = createButton("Exit");
+        button5.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.sendCommand("exit");
+                dispose();
+            }
+        });
 
         buttonPanel.add(button1);
         buttonPanel.add(button2);
@@ -88,7 +95,7 @@ public class PlayerScreen extends JFrame {
         buttonPanel.add(button4);
         buttonPanel.add(button5);
 
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH); // Mutarea panoului de butoane la baza de jos
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(titlePanel, BorderLayout.NORTH);
         add(mainPanel, BorderLayout.CENTER);
@@ -97,14 +104,14 @@ public class PlayerScreen extends JFrame {
         setVisible(true);
     }
 
-    // Metodă pentru a crea un buton cu colțuri rotunjite
+
     private JButton createButton(String text) {
         RoundedButton button = new RoundedButton(text);
-        button.setPreferredSize(new Dimension(100, 40)); // Dimensiuni personalizate
+        button.setPreferredSize(new Dimension(100, 40));
         return button;
     }
 
-    // Panou personalizat pentru a desena imaginea de fundal
+
     private class ImagePanel extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {

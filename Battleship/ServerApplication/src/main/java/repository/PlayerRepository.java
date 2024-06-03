@@ -24,4 +24,9 @@ public class PlayerRepository extends AbstractRepository<Player> {
         return super.findByName(name);
     }
 
+    @Override
+    public void deleteByName(String name) {
+        super.deleteByName(name);
+    }
+
 }

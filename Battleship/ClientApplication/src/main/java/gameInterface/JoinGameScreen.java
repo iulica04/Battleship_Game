@@ -42,13 +42,13 @@ public class JoinGameScreen extends JFrame {
 
         titlePanel.add(titleLabel, BorderLayout.CENTER);
 
-        // Panou de căutare
+
         JPanel searchPanel = new JPanel(new BorderLayout());
         searchField = new JTextField();
         JButton searchButton = createButton("Search");
         searchButton.addActionListener(e -> searchGameById());
 
-        // Adăugare buton de refresh
+
         JButton refreshButton = createButton("\u21BB");
         refreshButton.setPreferredSize(new Dimension(50, 30));
         refreshButton.addActionListener(e -> client.sendCommand("list_games"));
@@ -69,7 +69,7 @@ public class JoinGameScreen extends JFrame {
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Panou de butoane
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
         JButton joinButton = createButton("Join Selected Game");
@@ -83,7 +83,7 @@ public class JoinGameScreen extends JFrame {
                     String command = "join game " + gameId;
                     System.out.println("Sending command: " + command);
                     client.sendCommand(command);
-                    // dispose();
+                    dispose();
                 } else {
                     JOptionPane.showMessageDialog(null, "Please select a game to join", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -91,6 +91,7 @@ public class JoinGameScreen extends JFrame {
         });
 
         JButton randomButton = createButton("Random Game");
+
         randomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -100,7 +101,11 @@ public class JoinGameScreen extends JFrame {
                 }
                 if (games.length > 0) {
                     String randomGame = games[(int) (Math.random() * games.length)];
-                    client.sendCommand("join " + randomGame);
+                    String[] parts = randomGame.split(" ");
+                    String gameId = parts[2];
+                    String command = "join game " + gameId;
+                    System.out.println("Sending command: " + command);
+                    client.sendCommand(command);
                     dispose();
                 } else {
                     JOptionPane.showMessageDialog(null, "No games available to join", "Error", JOptionPane.ERROR_MESSAGE);
@@ -117,7 +122,7 @@ public class JoinGameScreen extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Request the list of games from the server
+
         client.sendCommand("list_games");
     }
 
@@ -157,7 +162,7 @@ public class JoinGameScreen extends JFrame {
 
     private JButton createButton(String text) {
         RoundedButton button = new RoundedButton(text);
-        button.setPreferredSize(new Dimension(150, 40)); // Dimensiuni personalizate
+        button.setPreferredSize(new Dimension(150, 40));
         return button;
     }
 

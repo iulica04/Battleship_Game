@@ -265,7 +265,7 @@ public class ClientThread extends Thread {
                     out.println("Am afisat opponent's view" + (player.displayOpponentView()));
 
                 } else if (inputLine.equals("exit")) {
-
+                    player.deletePlayer();
                     break;
 
                 } else if (inputLine.equals("list_games")) {
