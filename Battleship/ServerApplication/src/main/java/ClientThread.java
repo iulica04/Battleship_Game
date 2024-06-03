@@ -14,6 +14,7 @@ public class ClientThread extends Thread {
     private PlayerManager player;
     private boolean running = false;
     private int totalOfShips = 0;
+    private int gameIdServer;
 
     public ClientThread(Socket clientSocket, GameServer server) {
         this.clientSocket = clientSocket;
@@ -67,9 +68,9 @@ public class ClientThread extends Thread {
                     break;
 
                 } else if (inputLine.equals("create game")) {
-                    int gameId = server.createGame(player);
-                    game = server.getGame(gameId);
-                    out.println("Game created with " + gameId + "! Waiting for an opponent to join...");
+                    gameIdServer = server.createGame(player);
+                    game = server.getGame(gameIdServer);
+                    out.println("Game created with " + gameIdServer + " ! Waiting for an opponent to join...");
                     totalOfShips=0;
 
                 } else if (inputLine.contains("check")) {
@@ -91,7 +92,7 @@ public class ClientThread extends Thread {
                     if (game != null) {
                         if (!game.allPlayersAreJoined()) {
                             game.addSecondPlayer(player);
-                            out.println("You joined the game with id " + gameId + "!");
+                            out.println("You joined the game with id " + gameId + " ! " + playerName + " waiting for the game to start...");
                         } else {
                             out.println("Game" + gameId + " is already full!");
                         }
@@ -264,6 +265,7 @@ public class ClientThread extends Thread {
                     out.println("Am afisat opponent's view" + (player.displayOpponentView()));
 
                 } else if (inputLine.equals("exit")) {
+
                     break;
 
                 } else if (inputLine.equals("list_games")) {
@@ -273,7 +275,13 @@ public class ClientThread extends Thread {
                     player.clearBoards();
                     out.println("Boards cleared!");
 
-                } else {
+                }else if(inputLine.equals("game over")){
+
+                    GameManager games = new GameManager();
+                    games.removeGame(gameIdServer);
+                    out.println("Game over! The game was removed!");
+
+                }else {
                     out.println("Invalid command " + inputLine);
                 }
             }

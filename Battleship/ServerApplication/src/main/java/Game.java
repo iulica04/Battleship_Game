@@ -33,7 +33,7 @@ public class Game {
         this.player2 = player2;
         this.players.add(player2);
         player1.sendMessage(player2.getName() + " has joined the game!");
-        player2.sendMessage("You have joined the game!");
+        //player2.sendMessage("You have joined the game!");
     }
 
     public synchronized boolean allPlayersAreJoined() {

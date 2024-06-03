@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import gameInterface.elements.RoundedButton;
 
 public class MyBoardUI extends JFrame {
     private GameClient client;
@@ -171,75 +172,6 @@ public class MyBoardUI extends JFrame {
         RoundedButton button = new RoundedButton(text);
         button.setPreferredSize(new Dimension(100, 40)); // Dimensiuni personalizate
         return button;
-    }
-
-    // Clasa personalizata pentru butoane cu colturi rotunjite
-    private class RoundedButton extends JButton {
-        private Color pressedBackgroundColor;
-        private Color hoverBackgroundColor;
-
-        public RoundedButton(String text) {
-            super(text);
-            setContentAreaFilled(false);
-            setBackground(cadetGrey);
-            setForeground(tyrianPurple);
-            pressedBackgroundColor = taupeGray;
-            hoverBackgroundColor = mintGreen;
-            init();
-        }
-
-        private void init() {
-            addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    setBackground(hoverBackgroundColor);
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent evt) {
-                    setBackground(cadetGrey);
-                }
-            });
-
-            addChangeListener(e -> {
-                if (getModel().isPressed()) {
-                    setBackground(pressedBackgroundColor);
-                } else if (getModel().isRollover()) {
-                    setBackground(hoverBackgroundColor);
-                } else {
-                    setBackground(cadetGrey);
-                }
-            });
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            if (getModel().isArmed()) {
-                g.setColor(pressedBackgroundColor);
-            } else if (getModel().isRollover()) {
-                g.setColor(hoverBackgroundColor);
-            } else {
-                g.setColor(getBackground());
-            }
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-            g2.setColor(getForeground());
-            FontMetrics fm = g2.getFontMetrics();
-            int x = (getWidth() - fm.stringWidth(getText())) / 2;
-            int y = (getHeight() + fm.getAscent()) / 2 - 2;
-            g2.drawString(getText(), x, y);
-            g2.dispose();
-        }
-
-        @Override
-        protected void paintBorder(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getForeground());
-            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
-            g2.dispose();
-        }
     }
 
     // Metoda pentru a elimina toti listenerii de mouse de pe celule dupa ce o barca a fost stearsa
@@ -538,7 +470,6 @@ public class MyBoardUI extends JFrame {
 
     private void sendCommandSetPositions(int x1, int y1, int x2, int y2, String shipName) {
         String command = "place ship " + x1 + " " + y1 + " " + x2 + " " + y2;
-        //    System.out.println("Sending move: " + command);
         client.sendCommand(command);
     }
 
