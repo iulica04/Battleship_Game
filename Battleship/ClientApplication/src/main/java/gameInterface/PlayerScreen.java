@@ -26,13 +26,15 @@ public class PlayerScreen extends JFrame {
     Color tyrianPurple = Color.decode("#471732");
     Color taupeGray = Color.decode("#7A7885");
     Color mintGreen = Color.decode("#CDF2EB");
+    Color red = Color.decode("#980B14");
+
 
     public PlayerScreen(GameClient client, String playerName) {
         this.playerName = playerName;
         this.client = client;
 
         try {
-            backgroundImage = ImageIO.read(new File("Battleship/ClientApplication/src/main/resources/utils/1299.jpg"));
+            backgroundImage = ImageIO.read(new File("Battleship/ClientApplication/src/main/resources/utils/PhotoForPlayerScreen.jpeg"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,7 +49,7 @@ public class PlayerScreen extends JFrame {
 
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setPreferredSize(new Dimension(1200, 100));
-        titlePanel.setBackground(delftBlue);
+        titlePanel.setBackground(red);
 
         JLabel titleLabel = new JLabel("Welcome, " + playerName + "!", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 40));
@@ -80,7 +82,6 @@ public class PlayerScreen extends JFrame {
         JButton button4 = createButton("Ranking");
         JButton button5 = createButton("Exit");
 
-        // Adăugarea butoanelor în panou
         buttonPanel.add(button1);
         buttonPanel.add(button2);
         buttonPanel.add(button3);
@@ -113,9 +114,5 @@ public class PlayerScreen extends JFrame {
             }
         }
     }
-
-    // Clasă personalizata pentru butoane cu colturi rotunjite
-
-
 
 }

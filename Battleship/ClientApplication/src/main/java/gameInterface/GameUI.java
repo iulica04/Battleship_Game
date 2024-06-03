@@ -84,8 +84,6 @@ public class GameUI extends JFrame {
 
 
 
-
-
         JPanel rightPanel = new JPanel(new BorderLayout());
 
         playerGrid = new JPanel[10][10];
@@ -130,7 +128,6 @@ public class GameUI extends JFrame {
         timer.start();
 
         handleServerResponse("display board");
-
     }
 
     private void updateTimer() {
