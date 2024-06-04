@@ -16,9 +16,6 @@ public class JoinGameScreen extends JFrame {
     private JList<String> gamesList;
     private JTextField searchField;
     Color cadetGrey = Color.decode("#91A6AE");
-    Color tyrianPurple = Color.decode("#471732");
-    Color taupeGray = Color.decode("#7A7885");
-    Color mintGreen = Color.decode("#CDF2EB");
     Color delftBlue = Color.decode("#414163");
 
     public JoinGameScreen(GameClient client) {

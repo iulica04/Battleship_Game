@@ -1,6 +1,8 @@
 package gameInterface;
+
 import client.GameClient;
 import gameInterface.elements.RoundedButton;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;

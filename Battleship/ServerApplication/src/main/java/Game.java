@@ -17,10 +17,10 @@ public class Game {
     private boolean settedShipsByBoth = false;
     private boolean getLastMoveHit = false;
     private boolean hasPlayerMadeMove = false;
-    private boolean stillPlayerTurn= false;
+    private boolean stillPlayerTurn = false;
     private final Object moveLock = new Object();
     private boolean gameOver = false;
-    private List<PlayerManager> players=new ArrayList<>();
+    private List<PlayerManager> players = new ArrayList<>();
     private PlayerManager currentPlayer;
     private PlayerManager leavingPlayer = null;
 
@@ -47,7 +47,7 @@ public class Game {
         for (PlayerManager p : getPlayers()) {
             if (!p.getBoard().allShipsPlaced()) {
                 settedShipsByBoth = false;
-            }else{
+            } else {
                 settedShipsByBoth = true;
             }
         }
@@ -70,14 +70,15 @@ public class Game {
             new Thread(this::runGameLoop).start();
         }
     }
+
     public boolean makeMove(int x, int y, PlayerManager opponent) {
         boolean hit = opponent.getBoard().attackCell(x, y);
         opponent.getOpponentViewBoard().updateCell(x, y, hit);
 
         synchronized (moveLock) {
-            if(opponent == player1) {
+            if (opponent == player1) {
                 currentPlayer = player2;
-            }else{
+            } else {
                 currentPlayer = player1;
             }
             currentPlayer.setLastMoveHit(hit);
@@ -109,8 +110,8 @@ public class Game {
                 }
             }
 
-            if(leavingPlayer != null){
-               // endGame(determineWinner());
+            if (leavingPlayer != null) {
+                // endGame(determineWinner());
                 return;
             }
 
@@ -137,10 +138,8 @@ public class Game {
                     return;
                 }
             }
-
         }
     }
-
 
 
     private void endGame(String winner) {
@@ -158,16 +157,16 @@ public class Game {
             player1.clearBoards();
             player2.clearBoards();
         } else if (winner.equals("Player left!")) {
-            if(player1 == leavingPlayer)
+            if (player1 == leavingPlayer)
                 player2.sendMessage("The other player left! HERE");
             else player1.sendMessage("The other player left! Here");
 
-        }else{
+        } else {
             player1.sendMessage("Game over! The winner is " + winner);
             player2.sendMessage("Game over! The winner is " + winner);
         }
 
-        if(gameTimer != null){
+        if (gameTimer != null) {
             gameTimer.cancel();
             gameTimer = new Timer();
         }
@@ -184,18 +183,17 @@ public class Game {
     }
 
 
-
     private String determineWinner() {
 
         if (player1.allShipsSunk()) {
             return player1.getName();
         } else if (player2.allShipsSunk()) {
             return player2.getName();
-        }else if(LosingPlayer!=null){
+        } else if (LosingPlayer != null) {
             return "Time's up! ";
-        }else if(leavingPlayer!=null){
+        } else if (leavingPlayer != null) {
             return "Player left!";
-        } else{
+        } else {
             return "It's a tie!";
         }
     }
@@ -217,7 +215,7 @@ public class Game {
         endGame(determineWinner());
 
         gameOver = true;
-        if(gameTimer != null){
+        if (gameTimer != null) {
             gameTimer.cancel();
             gameTimer = new Timer();
         }
@@ -226,7 +224,6 @@ public class Game {
             player2.clearBoards();
         }
     }
-
 
 
     public PlayerManager getPlayer1() {
@@ -240,18 +237,21 @@ public class Game {
     public boolean isPlayer1Turn() {
         return player1Turn;
     }
+
     public List<PlayerManager> getPlayers() {
         return players;
-    }public void setPlayers(List<PlayerManager> players) {
+    }
+
+    public void setPlayers(List<PlayerManager> players) {
         this.players = players;
     }
+
     public String getGameStatus() {
         StringBuilder sb = new StringBuilder();
         sb.append("In joc sunt urmatorii jucatori: ").append(" ");
         for (PlayerManager player : getPlayers()) {
             sb.append("- ").append(player.getName()).append(" ");
         }
-        /*sb.append("| Jucatorul care a creat jocul: ").append(getGame(nextGameId).getPlayer1().getName()).append(" ");*/
         return sb.toString();
     }
 

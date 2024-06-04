@@ -1,13 +1,14 @@
 package gameInterface;
 
 import client.GameClient;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import gameInterface.elements.RoundedButton;
 
+import gameInterface.elements.RoundedButton;
 
 
 public class GameUI extends JFrame {
@@ -52,7 +53,7 @@ public class GameUI extends JFrame {
         titlePanel.setPreferredSize(new Dimension(1200, 70));
         titlePanel.setBackground(delftBlue);
 
-         titleLabel = new JLabel("Good luck!", SwingConstants.CENTER);
+        titleLabel = new JLabel("Good luck!", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 30));
         titleLabel.setForeground(cadetGrey);
 
@@ -60,7 +61,7 @@ public class GameUI extends JFrame {
 
         // Initialize status label
         statusLabel = new JLabel("", SwingConstants.CENTER);
-       // statusLabel = new JLabel("Game " + idGame + " : Waiting for an opponent...", SwingConstants.CENTER);
+        // statusLabel = new JLabel("Game " + idGame + " : Waiting for an opponent...", SwingConstants.CENTER);
         statusLabel.setFont(new Font("Serif", Font.BOLD, 20));
         statusLabel.setForeground(Color.white);
         titlePanel.add(statusLabel, BorderLayout.SOUTH);
@@ -74,7 +75,7 @@ public class GameUI extends JFrame {
         timerPanel.setBackground(delftBlue);
         titlePanel.add(timerPanel, BorderLayout.EAST);
 
-       /////////////////////////LEFT PANEL
+        /////////////////////////LEFT PANEL
         opponentGrid = new JPanel[10][10];
         initializeGrids(opponentGrid, false);
         JPanel leftPanel = new JPanel(new BorderLayout());
@@ -138,9 +139,9 @@ public class GameUI extends JFrame {
         timer = new Timer(1000, e -> updateTimer());
 
 
-
         handleServerResponse("display board");
     }
+
     private JButton createButton(String text) {
         RoundedButton button = new RoundedButton(text);
         button.setPreferredSize(new Dimension(100, 40)); // Dimensiuni personalizate
@@ -181,10 +182,10 @@ public class GameUI extends JFrame {
                     grid[i][j].addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
                             if (gameOver == true) {
-                               JOptionPane.showMessageDialog(null, "Game Over!");
-                            }else if(startGame == false){
+                                JOptionPane.showMessageDialog(null, "Game Over!");
+                            } else if (startGame == false) {
                                 JOptionPane.showMessageDialog(null, "The game didn't start!You can't make a move.");
-                            }else {
+                            } else {
                                 if (isPlayerTurn == true) {
                                     sendMove(finalI, finalJ);
                                 } else {
@@ -242,7 +243,7 @@ public class GameUI extends JFrame {
 
                 } else if (response.startsWith("Need two players to start the game.") ||
                         response.startsWith("All players must place all ships before starting the game.")) {
-                        statusLabel.setText(response);
+                    statusLabel.setText(response);
 
                 } else if (!gameOver && response.equals("Time's up! Your turn has ended.")) {
                     gameOver = true;
@@ -250,7 +251,7 @@ public class GameUI extends JFrame {
                     statusLabel.setText("Time's up! Your turn has ended. You lost the game!");
                     resetGame();
                     sendGameOver();
-                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/lose.jpg","Time's up! Your turn has ended. You lost the game!");
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/lose.jpg", "Time's up! Your turn has ended. You lost the game!");
 
 
                 } else if (!gameOver && response.equals("Time's up! Your opponent's turn has ended.")) {
@@ -259,7 +260,7 @@ public class GameUI extends JFrame {
                     statusLabel.setText("You have WON! You opponent time has ended!");
                     resetGame();
                     sendGameOver();
-                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg","You have WON! You opponent time has ended!");
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg", "You have WON! You opponent time has ended!");
 
 
                 } /*else if (response.contains("Game over! The winner is") ||
@@ -284,7 +285,7 @@ public class GameUI extends JFrame {
                     statusLabel.setText("Congratulations! You have WON the game!");
                     resetGame();
                     sendGameOver();
-                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg","Congratulations! You have WON the game!");
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg", "Congratulations! You have WON the game!");
 
 
                 } else if (response.contains("All your ships have been sunk!")) {
@@ -300,19 +301,19 @@ public class GameUI extends JFrame {
                     statusLabel.setText("All your ships have been sunk! You lost the game!");
                     resetGame();
                     sendGameOver();
-                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/lose.jpg","All your ships have been sunk! You lost the game!");
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/lose.jpg", "All your ships have been sunk! You lost the game!");
 
 
-                } else if(response.startsWith("Game over! It's a tie!")){
+                } else if (response.startsWith("Game over! It's a tie!")) {
                     isPlayerTurn = false;
                     gameOver = true;
                     statusLabel.setText("Game over! It's a tie! It lasted too long!");
                     resetGame();
                     sendGameOver();
-                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/it'satie.jpg","Game over! It's a tie! It lasted too long!");
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/it'satie.jpg", "Game over! It's a tie! It lasted too long!");
 
 
-                }else if (response.startsWith("Hit") || response.startsWith("Miss")) {
+                } else if (response.startsWith("Hit") || response.startsWith("Miss")) {
                     String[] parts = response.split(" ");
                     String result = parts[0];
                     String coordinates = parts[1] + " " + parts[2];
@@ -348,9 +349,9 @@ public class GameUI extends JFrame {
                     idGame = Integer.parseInt(parts[3]);
                     statusLabel.setText("Game " + idGame + " : Waiting for an opponent...");
 
-                }else if(response.startsWith("The other player left!")){
+                } else if (response.startsWith("The other player left!")) {
                     resetGame();
-                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg",response);
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg", response);
                 }
             }
         });
@@ -367,21 +368,22 @@ public class GameUI extends JFrame {
 
             JPanel targetPanel = opponentGrid[x][y];
 
-            if(isPlayerTurn == true){
+            if (isPlayerTurn == true) {
                 if ("Hit".equals(result)) {
                     targetPanel.setBackground(Color.GREEN);
-                    isPlayerTurn= true;
+                    isPlayerTurn = true;
                 } else if ("Miss".equals(result)) {
                     targetPanel.setBackground(Color.RED);
-                    isPlayerTurn=false;
+                    isPlayerTurn = false;
                 }
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(this, "It's not your turn!");
 
             }
             targetPanel.repaint();
         }
     }
+
     private void updatePlayerGridOpponent(int x, int y, boolean hit) {
         JPanel targetPanel = playerGrid[x][y];
 
@@ -414,13 +416,14 @@ public class GameUI extends JFrame {
             }
         }
     }
+
     private void resetGame() {
         timer.stop();
         gameOver = false;
         isPlayerTurn = false;
         startTime = 0;
         timerLabel.setText("Time: 00:30");
-       // sendClearBords();
+        // sendClearBords();
     }
 
     private void sendMove(int x, int y) {
@@ -434,23 +437,26 @@ public class GameUI extends JFrame {
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }
+
     private void sendStartGame() {
         String command = "start game";
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }
+
     private void sendClearBords() {
         String command = "clear boards";
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }
-    private void sendGameOver( ) {
+
+    private void sendGameOver() {
         String command = "game over";
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }
 
-    private void exitDoor(String path, String response){
+    private void exitDoor(String path, String response) {
         timer.stop();
         ImageIcon gameOverIcon = new ImageIcon(path);
         JButton playerScreenButton = createButton("Player Screen");

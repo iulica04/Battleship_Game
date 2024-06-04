@@ -35,8 +35,8 @@ public class GameServer {
         return gameManager.getGame(gameId);
     }
 
-    public int getGameId() {
-        return gameManager.getGameId();
+    public void removeGame(int gameId) {
+        gameManager.removeGame(gameId);
     }
 
     public List<String> getAllGames() {
