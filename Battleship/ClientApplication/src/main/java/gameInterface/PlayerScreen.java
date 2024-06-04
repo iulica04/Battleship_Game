@@ -78,8 +78,7 @@ public class PlayerScreen extends JFrame {
                 dispose();
             }
         });
-        JButton button3 = createButton("My History");
-        JButton button4 = createButton("Ranking");
+
         JButton button5 = createButton("Exit");
         button5.addActionListener(new ActionListener() {
             @Override
@@ -91,8 +90,6 @@ public class PlayerScreen extends JFrame {
 
         buttonPanel.add(button1);
         buttonPanel.add(button2);
-        buttonPanel.add(button3);
-        buttonPanel.add(button4);
         buttonPanel.add(button5);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
