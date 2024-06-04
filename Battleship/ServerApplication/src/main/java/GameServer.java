@@ -38,6 +38,13 @@ public class GameServer {
     public void removeGame(int gameId) {
         gameManager.removeGame(gameId);
     }
+    public synchronized void playerLeftGameS(PlayerManager player, int gameId) {
+        Game game = getGame(gameId);
+        if (game != null) {
+            game.playerLeftGame(player);
+        }
+
+    }
 
     public List<String> getAllGames() {
         return gameManager.getAllGames();

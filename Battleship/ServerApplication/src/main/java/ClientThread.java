@@ -280,6 +280,7 @@ public class ClientThread extends Thread {
 
                 } else if (inputLine.equals("player left game")) {
 
+                    server.playerLeftGameS(player, gameIdServer);
                     server.removeGame(gameIdServer);
                     out.println("Game over! The game was removed!");
 

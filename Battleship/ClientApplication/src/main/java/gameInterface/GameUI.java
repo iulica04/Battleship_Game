@@ -119,6 +119,7 @@ public class GameUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 sendStartGame();
                 startGame = true;
+                isPlayerTurn = true;
             }
         });
 
@@ -335,6 +336,7 @@ public class GameUI extends JFrame {
                     updatePlayerGridOpponent(x, y, hit);
 
                 } else if (response.contains(" has joined the game!")) {
+                    isPlayerTurn =true;
                     statusLabel.setText(response);
                     statusLabel.setText("The other player has joined the game! Now, you can START THE GAME!!!!!!!");
 
@@ -345,6 +347,7 @@ public class GameUI extends JFrame {
                     statusLabel.setText("Game " + idGame + ": The game is full, " + playerName + " be ready  to play!");
 
                 } else if (response.startsWith("Game created with")) {
+                    isPlayerTurn= true;
                     String[] parts = response.split(" ");
                     idGame = Integer.parseInt(parts[3]);
                     statusLabel.setText("Game " + idGame + " : Waiting for an opponent...");
@@ -423,7 +426,6 @@ public class GameUI extends JFrame {
         isPlayerTurn = false;
         startTime = 0;
         timerLabel.setText("Time: 00:30");
-        // sendClearBords();
     }
 
     private void sendMove(int x, int y) {

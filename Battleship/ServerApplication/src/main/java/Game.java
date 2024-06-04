@@ -57,8 +57,10 @@ public class Game {
     public synchronized void start() {
         if (isReadyToStart()) {
             this.started = true;
+
             player1.sendMessage("Game started!");
             player2.sendMessage("Game started!");
+            player1Turn = true;
 
             gameTimer.schedule(new TimerTask() {
                 @Override
@@ -246,6 +248,9 @@ public class Game {
         this.players = players;
     }
 
+    public void setPlayer1Turn(boolean turn) {
+        this.player1Turn = turn;
+    }
     public String getGameStatus() {
         StringBuilder sb = new StringBuilder();
         sb.append("In joc sunt urmatorii jucatori: ").append(" ");
