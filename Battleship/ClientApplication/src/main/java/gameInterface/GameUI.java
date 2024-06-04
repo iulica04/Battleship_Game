@@ -336,7 +336,7 @@ public class GameUI extends JFrame {
                     updatePlayerGridOpponent(x, y, hit);
 
                 } else if (response.contains(" has joined the game!")) {
-                    isPlayerTurn =true;
+                    isPlayerTurn = true;
                     statusLabel.setText(response);
                     statusLabel.setText("The other player has joined the game! Now, you can START THE GAME!!!!!!!");
 
@@ -347,7 +347,7 @@ public class GameUI extends JFrame {
                     statusLabel.setText("Game " + idGame + ": The game is full, " + playerName + " be ready  to play!");
 
                 } else if (response.startsWith("Game created with")) {
-                    isPlayerTurn= true;
+                    isPlayerTurn = true;
                     String[] parts = response.split(" ");
                     idGame = Integer.parseInt(parts[3]);
                     statusLabel.setText("Game " + idGame + " : Waiting for an opponent...");
@@ -371,18 +371,14 @@ public class GameUI extends JFrame {
 
             JPanel targetPanel = opponentGrid[x][y];
 
-            if (isPlayerTurn == true) {
-                if ("Hit".equals(result)) {
-                    targetPanel.setBackground(Color.GREEN);
-                    isPlayerTurn = true;
-                } else if ("Miss".equals(result)) {
-                    targetPanel.setBackground(Color.RED);
-                    isPlayerTurn = false;
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "It's not your turn!");
-
+            if ("Hit".equals(result)) {
+                targetPanel.setBackground(Color.GREEN);
+                isPlayerTurn = true;
+            } else if ("Miss".equals(result)) {
+                targetPanel.setBackground(Color.RED);
+                isPlayerTurn = false;
             }
+
             targetPanel.repaint();
         }
     }

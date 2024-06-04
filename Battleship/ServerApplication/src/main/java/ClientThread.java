@@ -226,10 +226,7 @@ public class ClientThread extends Thread {
                             if (opponent.allShipsSunk()) {
                                 out.println("Hit " + x + " " + y + " ! Congratulations! You sank all opponent's ships!");
                                 opponent.sendMessage("Your ship was miss at " + x + " " + y + " ! All your ships have been sunk!");
-                                //stergem tablele dupa ce se termina jocul
                                 totalOfShips = 0;
-                                // opponent.clearBoards();
-                                //  player.clearBoards();
                             } else {
                                 out.println("Hit " + x + " " + y + " ! " + player.getName() + "'s turn again.");
                                 opponent.sendMessage("Your ship was hit at " + x + " " + y + " !");
@@ -279,10 +276,8 @@ public class ClientThread extends Thread {
                     out.println("Game over! The game was removed!");
 
                 } else if (inputLine.equals("player left game")) {
-
                     server.playerLeftGameS(player, gameIdServer);
-                    server.removeGame(gameIdServer);
-                    out.println("Game over! The game was removed!");
+                    out.println("Game over! The game was removed and the opponent left!");
 
                 } else {
                     out.println("Invalid command " + inputLine);

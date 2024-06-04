@@ -42,6 +42,7 @@ public class GameServer {
         Game game = getGame(gameId);
         if (game != null) {
             game.playerLeftGame(player);
+            gameManager.removeGame(gameId);
         }
 
     }

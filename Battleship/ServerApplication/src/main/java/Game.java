@@ -36,7 +36,6 @@ public class Game {
         this.player2 = player2;
         this.players.add(player2);
         player1.sendMessage(player2.getName() + " has joined the game!");
-        //player2.sendMessage("You have joined the game!");
     }
 
     public synchronized boolean allPlayersAreJoined() {
@@ -113,20 +112,21 @@ public class Game {
             }
 
             if (leavingPlayer != null) {
-                // endGame(determineWinner());
+                System.out.println("Player left the game. SUNT AICI");
                 return;
             }
 
             long turnEndTime = System.currentTimeMillis();
             if (turnEndTime - turnStartTime >= 30000) {
-                currentPlayer.sendMessage("Time's up! Your turn has ended.");
-                opponentPlayer.sendMessage("Time's up! Your opponent's turn has ended.");
-                gameOver = true;
-                LosingPlayer = currentPlayer;
-                WinningPlayer = opponentPlayer;
-                endGame(determineWinner());
-                return;
-            }
+                    currentPlayer.sendMessage("Time's up! Your turn has ended.");
+                    opponentPlayer.sendMessage("Time's up! Your opponent's turn has ended.");
+                    gameOver = true;
+                    LosingPlayer = currentPlayer;
+                    WinningPlayer = opponentPlayer;
+                    endGame(determineWinner());
+                    return;
+                }
+
 
             if (hasPlayerMadeMove) {
                 hasPlayerMadeMove = false;
@@ -175,6 +175,7 @@ public class Game {
         gameOver = false;
         player1Turn = true;
         LosingPlayer = null;
+        leavingPlayer = null;
         WinningPlayer = null;
         settedShipsByBoth = false;
         getLastMoveHit = false;
@@ -248,9 +249,6 @@ public class Game {
         this.players = players;
     }
 
-    public void setPlayer1Turn(boolean turn) {
-        this.player1Turn = turn;
-    }
     public String getGameStatus() {
         StringBuilder sb = new StringBuilder();
         sb.append("In joc sunt urmatorii jucatori: ").append(" ");
