@@ -230,8 +230,8 @@ public class ClientThread extends Thread {
                                 opponent.sendMessage("Your ship was miss at "+ x + " " + y + " ! All your ships have been sunk!");
                                 //stergem tablele dupa ce se termina jocul
                                 totalOfShips=0;
-                                opponent.clearBoards();
-                                player.clearBoards();
+                               // opponent.clearBoards();
+                              //  player.clearBoards();
                             } else {
                                 out.println("Hit "+ x +" " + y + " ! " + player.getName() + "'s turn again." );
                                 opponent.sendMessage("Your ship was hit at "+ x + " " + y + " !");
@@ -276,7 +276,12 @@ public class ClientThread extends Thread {
                     out.println("Boards cleared!");
 
                 }else if(inputLine.equals("game over")){
+                    GameManager games = new GameManager();
+                    games.removeGame(gameIdServer);
+                    out.println("Game over! The game was removed!");
 
+                }else if(inputLine.equals("player left game")){
+                    game.playerLeftGame(player);
                     GameManager games = new GameManager();
                     games.removeGame(gameIdServer);
                     out.println("Game over! The game was removed!");

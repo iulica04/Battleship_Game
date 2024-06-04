@@ -2,6 +2,8 @@ package entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class Player {
@@ -14,6 +16,11 @@ public class Player {
     @Column(name = "name")
     private String name;
 
+    /*@OneToMany(mappedBy = "player1")
+    private List<Games> gamesAsPlayer1;
+
+    @OneToMany(mappedBy = "player2")
+    private List<Games> gamesAsPlayer2;*/
     Player() {
     }
 

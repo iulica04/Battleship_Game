@@ -9,10 +9,14 @@ import java.awt.event.ActionListener;
 import gameInterface.elements.RoundedButton;
 
 
+
 public class GameUI extends JFrame {
     private GameClient client;
     private JPanel[][] opponentGrid;
     private JPanel[][] playerGrid;
+    JPanel titlePanel;
+    JLabel titleLabel;
+    JPanel timerPanel;
     private JLabel timerLabel;
     private Timer timer;
     private long gameDurationMillis = 30000; // 1 minutes
@@ -20,16 +24,16 @@ public class GameUI extends JFrame {
     private long startTime;
     private String playerName;
     private boolean isPlayerTurn = false;
-    private boolean gameOver = false;
+
     private JLabel statusLabel;
     Color cadetGrey = Color.decode("#91A6AE");
     Color delftBlue = Color.decode("#414163");
-    Color tyrianPurple = Color.decode("#471732");
-    Color taupeGray = Color.decode("#7A7885");
-    Color brown = Color.decode("#D4A276");
+    Color greenStart = Color.decode("#34be76");
+    Color redStop = Color.decode("#ff2c2c");
     Color mintGreen = Color.decode("#CDF2EB");
     int idGame = 0;
     boolean startGame = false;
+    public boolean gameOver = false;
 
 
     public GameUI(GameClient client, String playerName) {
@@ -44,11 +48,11 @@ public class GameUI extends JFrame {
         setLayout(new BorderLayout());
 
         /////////////////////TITLE PANEL
-        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel = new JPanel(new BorderLayout());
         titlePanel.setPreferredSize(new Dimension(1200, 70));
         titlePanel.setBackground(delftBlue);
 
-        JLabel titleLabel = new JLabel("Good luck!", SwingConstants.CENTER);
+         titleLabel = new JLabel("Good luck!", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 30));
         titleLabel.setForeground(cadetGrey);
 
@@ -65,7 +69,7 @@ public class GameUI extends JFrame {
         timerLabel = new JLabel("Time: 00:30");
         timerLabel.setFont(new Font("Serif", Font.BOLD, 20));
         timerLabel.setForeground(Color.RED);
-        JPanel timerPanel = new JPanel();
+        timerPanel = new JPanel();
         timerPanel.add(timerLabel);
         timerPanel.setBackground(delftBlue);
         titlePanel.add(timerPanel, BorderLayout.EAST);
@@ -102,17 +106,17 @@ public class GameUI extends JFrame {
         goToPlayerScreenButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                client.sendCommand("player left game");
+                resetGame();
                 SwingUtilities.invokeLater(() -> new PlayerScreen(client, playerName));
-                gameOver = true;
                 dispose();
             }
         });
+
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendStartGame();
-                isPlayerTurn = true;
                 startGame = true;
             }
         });
@@ -177,11 +181,11 @@ public class GameUI extends JFrame {
                     grid[i][j].addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
                             if (gameOver == true) {
-                                JOptionPane.showMessageDialog(null, "Game Over!");
+                               JOptionPane.showMessageDialog(null, "Game Over!");
                             }else if(startGame == false){
                                 JOptionPane.showMessageDialog(null, "The game didn't start!You can't make a move.");
-                            }else{
-                                if(isPlayerTurn == true) {
+                            }else {
+                                if (isPlayerTurn == true) {
                                     sendMove(finalI, finalJ);
                                 } else {
                                     JOptionPane.showMessageDialog(null, "It's not your turn!");
@@ -217,7 +221,7 @@ public class GameUI extends JFrame {
 
     private void handleServerResponse(String response) {
         SwingUtilities.invokeLater(() -> {
-            if (response != null) {
+            if (response != null && !gameOver) {
                 System.out.println("Received response from server GameUi: " + response);
 
                 if (response.startsWith("Your turn! Make a move!")) {
@@ -232,34 +236,43 @@ public class GameUI extends JFrame {
                 } else if (response.startsWith("Game started!")) {
                     statusLabel.setText("Game started!");
                     startGame = true;
+                    titlePanel.setBackground(greenStart);
+                    timerPanel.setBackground(greenStart);
+                    titleLabel.setForeground(Color.black);
 
                 } else if (response.startsWith("Need two players to start the game.") ||
                         response.startsWith("All players must place all ships before starting the game.")) {
                         statusLabel.setText(response);
 
                 } else if (!gameOver && response.equals("Time's up! Your turn has ended.")) {
-                    isPlayerTurn = false;
                     gameOver = true;
+                    isPlayerTurn = false;
                     statusLabel.setText("Time's up! Your turn has ended. You lost the game!");
                     resetGame();
                     sendGameOver();
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/lose.jpg","Time's up! Your turn has ended. You lost the game!");
+
 
                 } else if (!gameOver && response.equals("Time's up! Your opponent's turn has ended.")) {
-                    isPlayerTurn = false;
                     gameOver = true;
+                    isPlayerTurn = false;
                     statusLabel.setText("You have WON! You opponent time has ended!");
                     resetGame();
                     sendGameOver();
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg","You have WON! You opponent time has ended!");
 
-                } else if (response.contains("Game over! The winner is") ||
+
+                } /*else if (response.contains("Game over! The winner is") ||
                         response.contains("Game over due time up!")) {
-                    isPlayerTurn = false;
                     gameOver = true;
+                    isPlayerTurn = false;
                     statusLabel.setText(response);
                     resetGame();
                     sendGameOver();
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/lose.jpg",response);
 
-                } else if (response.contains("Congratulations!")) {
+
+                }*/ else if (response.contains("Congratulations!")) {
                     //ultima mutare
                     String[] parts = response.split(" ");
                     String result = parts[0];
@@ -271,6 +284,8 @@ public class GameUI extends JFrame {
                     statusLabel.setText("Congratulations! You have WON the game!");
                     resetGame();
                     sendGameOver();
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg","Congratulations! You have WON the game!");
+
 
                 } else if (response.contains("All your ships have been sunk!")) {
                     //ultima mutare
@@ -285,6 +300,8 @@ public class GameUI extends JFrame {
                     statusLabel.setText("All your ships have been sunk! You lost the game!");
                     resetGame();
                     sendGameOver();
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/lose.jpg","All your ships have been sunk! You lost the game!");
+
 
                 } else if(response.startsWith("Game over! It's a tie!")){
                     isPlayerTurn = false;
@@ -292,6 +309,8 @@ public class GameUI extends JFrame {
                     statusLabel.setText("Game over! It's a tie! It lasted too long!");
                     resetGame();
                     sendGameOver();
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/it'satie.jpg","Game over! It's a tie! It lasted too long!");
+
 
                 }else if (response.startsWith("Hit") || response.startsWith("Miss")) {
                     String[] parts = response.split(" ");
@@ -316,7 +335,6 @@ public class GameUI extends JFrame {
 
                 } else if (response.contains(" has joined the game!")) {
                     statusLabel.setText(response);
-                    isPlayerTurn = true;
                     statusLabel.setText("The other player has joined the game! Now, you can START THE GAME!!!!!!!");
 
                 } else if (response.contains("You joined the game with id")) {
@@ -326,11 +344,13 @@ public class GameUI extends JFrame {
                     statusLabel.setText("Game " + idGame + ": The game is full, " + playerName + " be ready  to play!");
 
                 } else if (response.startsWith("Game created with")) {
-                    isPlayerTurn = true;
                     String[] parts = response.split(" ");
                     idGame = Integer.parseInt(parts[3]);
                     statusLabel.setText("Game " + idGame + " : Waiting for an opponent...");
 
+                }else if(response.startsWith("The other player left!")){
+                    resetGame();
+                    exitDoor("Battleship/ClientApplication/src/main/resources/utils/winner.jpg",response);
                 }
             }
         });
@@ -400,7 +420,7 @@ public class GameUI extends JFrame {
         isPlayerTurn = false;
         startTime = 0;
         timerLabel.setText("Time: 00:30");
-        sendClearBords();
+       // sendClearBords();
     }
 
     private void sendMove(int x, int y) {
@@ -424,10 +444,36 @@ public class GameUI extends JFrame {
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
     }
-    private void sendGameOver() {
+    private void sendGameOver( ) {
         String command = "game over";
         System.out.println("Sending command: " + command);
         client.sendCommand(command);
+    }
+
+    private void exitDoor(String path, String response){
+        timer.stop();
+        ImageIcon gameOverIcon = new ImageIcon(path);
+        JButton playerScreenButton = createButton("Player Screen");
+        JOptionPane optionPane = new JOptionPane(
+                null,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                gameOverIcon,
+                new Object[]{playerScreenButton}
+        );
+
+        playerScreenButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    new PlayerScreen(client, playerName);
+                    dispose(); // Închide fereastra GameUI
+                    optionPane.setValue(JOptionPane.CLOSED_OPTION); // Închide JOptionPane
+                });
+            }
+        });
+
+        JDialog dialog = optionPane.createDialog(this, response);
+        dialog.setVisible(true);
     }
 
     private void closeWindow() {

@@ -1,3 +1,5 @@
+import entity.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -20,6 +22,7 @@ public class Game {
     private boolean gameOver = false;
     private List<PlayerManager> players=new ArrayList<>();
     private PlayerManager currentPlayer;
+    private PlayerManager leavingPlayer = null;
 
 
     public Game(PlayerManager player1) {
@@ -61,8 +64,6 @@ public class Game {
                 @Override
                 public void run() {
                     endGame(determineWinner());
-
-
                 }
             }, gameDurationMillis);
 
@@ -108,6 +109,11 @@ public class Game {
                 }
             }
 
+            if(leavingPlayer != null){
+               // endGame(determineWinner());
+                return;
+            }
+
             long turnEndTime = System.currentTimeMillis();
             if (turnEndTime - turnStartTime >= 30000) {
                 currentPlayer.sendMessage("Time's up! Your turn has ended.");
@@ -115,6 +121,8 @@ public class Game {
                 gameOver = true;
                 LosingPlayer = currentPlayer;
                 WinningPlayer = opponentPlayer;
+                endGame(determineWinner());
+                return;
             }
 
             if (hasPlayerMadeMove) {
@@ -122,36 +130,59 @@ public class Game {
                 if (!currentPlayer.getLastMoveHit()) {
                     player1Turn = !player1Turn;
                 }
+
+                if (currentPlayer.allShipsSunk() || opponentPlayer.allShipsSunk()) {
+                    gameOver = true;
+                    endGame(determineWinner());
+                    return;
+                }
             }
+
         }
     }
+
 
 
     private void endGame(String winner) {
         if (winner.equals("It's a tie!")) {
             player1.sendMessage("Game over! It's a tie!");
             player2.sendMessage("Game over! It's a tie!");
-
-        }else if(winner.equals("Time's up! ")) {
-            if(LosingPlayer.equals(player1)) {
-                player1.sendMessage("Game over due time up! The winner is " + player2.getName());
-                player2.sendMessage("Game over due time up! The winner is " + player2.getName());
-            }else{
-                player1.sendMessage("Game over  due time up! The winner is " + player1.getName());
-                player2.sendMessage("Game over  due time up! The winner is " + player1.getName());
+        } else if (winner.equals("Time's up! ")) {
+            if (LosingPlayer.equals(player1)) {
+                player1.sendMessage("Game over due to time up! The winner is " + player2.getName());
+                player2.sendMessage("Game over due to time up! The winner is " + player2.getName());
+            } else {
+                player1.sendMessage("Game over due to time up! The winner is " + player1.getName());
+                player2.sendMessage("Game over due to time up! The winner is " + player1.getName());
             }
-            //Daca timpul s-a scurs si s-a terminat jocul atunci se sterg toate tablele jucatorilor
             player1.clearBoards();
             player2.clearBoards();
-        }
-        else {
+        } else if (winner.equals("Player left!")) {
+            if(player1 == leavingPlayer)
+                player2.sendMessage("The other player left! HERE");
+            else player1.sendMessage("The other player left! Here");
+
+        }else{
             player1.sendMessage("Game over! The winner is " + winner);
             player2.sendMessage("Game over! The winner is " + winner);
         }
 
-        gameOver = true;
-        gameTimer.cancel();
+        if(gameTimer != null){
+            gameTimer.cancel();
+            gameTimer = new Timer();
+        }
+        gameOver = false;
+        player1Turn = true;
+        LosingPlayer = null;
+        WinningPlayer = null;
+        settedShipsByBoth = false;
+        getLastMoveHit = false;
+        hasPlayerMadeMove = false;
+        stillPlayerTurn = false;
+        player1.clearBoards();
+        player2.clearBoards();
     }
+
 
 
     private String determineWinner() {
@@ -162,8 +193,37 @@ public class Game {
             return player2.getName();
         }else if(LosingPlayer!=null){
             return "Time's up! ";
+        }else if(leavingPlayer!=null){
+            return "Player left!";
         } else{
             return "It's a tie!";
+        }
+    }
+
+    public synchronized void playerLeftGame(PlayerManager leavingPlayer1) {
+        if (leavingPlayer1 == player1) {
+            player1.sendMessage("You left the game.");
+            leavingPlayer = player1;
+            if (player2 != null) {
+                player2.sendMessage("Player left game. Game over!");
+            }
+        } else if (leavingPlayer1 == player2) {
+            player2.sendMessage("You left the game.");
+            leavingPlayer = player2;
+            if (player1 != null) {
+                player1.sendMessage("Player left game. Game over!");
+            }
+        }
+        endGame(determineWinner());
+
+        gameOver = true;
+        if(gameTimer != null){
+            gameTimer.cancel();
+            gameTimer = new Timer();
+        }
+        player1.clearBoards();
+        if (player2 != null) {
+            player2.clearBoards();
         }
     }
 
